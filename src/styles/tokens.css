@@ -1,0 +1,51 @@
+/*
+  Regulariza — Design tokens
+  Paleta baseada na identidade já usada no pitch (fundo grafite-azulado + acento teal),
+  aplicada de forma consistente nas telas de autenticação e cadastro.
+*/
+
+:root {
+  /* Superfícies */
+  --bg: #f5f7fa;
+  --bg-elevated: #ffffff;
+  --bg-card: #ffffff;
+  --bg-input: #f1f3f7;
+  --border: #e1e5eb;
+  --border-focus: #0ea99b;
+
+  /* Acento */
+  --teal-300: #0c8b7e;
+  --teal-400: #0ea99b;
+  --teal-500: #0c9285;
+  --teal-700: #0a6f64;
+  --indigo-600: #274690;
+
+  /* Texto */
+  --text-primary: #171b21;
+  --text-secondary: #5b6472;
+  --text-muted: #8a93a3;
+
+  /* Estado */
+  --danger: #d8433a;
+  --danger-bg: rgba(216, 67, 58, 0.08);
+  --success: #0c9285;
+
+  /* Tipografia */
+  --font-display: "Space Grotesk", "Sora", sans-serif;
+  --font-body: "Inter", sans-serif;
+
+  /* Raio e sombra */
+  --radius-sm: 8px;
+  --radius-md: 12px;
+  --radius-lg: 20px;
+  --shadow-card: 0 24px 50px -24px rgba(23, 27, 33, 0.18);
+
+  /* Espaçamento */
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 24px;
+  --space-6: 32px;
+  --space-7: 48px;
+}

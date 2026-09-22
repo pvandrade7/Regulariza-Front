@@ -1,0 +1,49 @@
+.cadastro-usuario-screen {
+  min-height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--space-5);
+  background:
+    radial-gradient(680px 420px at 82% 8%, rgba(14, 169, 155, 0.14), transparent 60%),
+    radial-gradient(600px 500px at 6% 100%, rgba(39, 70, 144, 0.08), transparent 65%),
+    var(--bg);
+}
+
+.cadastro-usuario-card {
+  width: 100%;
+  max-width: 440px;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: var(--space-7) var(--space-6);
+  box-shadow: var(--shadow-card);
+}
+
+.cadastro-usuario-eyebrow {
+  font-size: 12.5px;
+  color: var(--teal-400);
+  margin-bottom: var(--space-2);
+}
+
+.cadastro-usuario-title {
+  font-size: 28px;
+  margin-bottom: var(--space-2);
+}
+
+.cadastro-usuario-subtitle {
+  font-size: 14px;
+  margin-bottom: var(--space-6);
+}
+
+.cadastro-usuario-footer {
+  margin-top: var(--space-5);
+  font-size: 13.5px;
+  text-align: center;
+}
+
+@media (max-width: 480px) {
+  .cadastro-usuario-card .field-row.two-cols {
+    grid-template-columns: 1fr;
+  }
+}
