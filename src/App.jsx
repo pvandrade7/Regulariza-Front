@@ -2,8 +2,10 @@ import { BrowserRouter, Routes, Route, Navigate, useNavigate } from "react-route
 import Login from "./pages/Login/Login";
 import CadastroUsuario from "./pages/CadastroUsuario/CadastroUsuario";
 import CadastroEmpresa from "./pages/CadastroEmpresa/CadastroEmpresa";
+import PerfilEmpresa from "./pages/PerfilEmpresa/PerfilEmpresa";
 import RequireAuth from "./routes/RequireAuth";
 import { saveToken } from "./utils/auth";
+import { saveEmpresa, getEmpresa } from "./utils/empresaStorage";
 
 // Cada função abaixo "liga" uma tela às rotas e, por enquanto, a dados falsos.
 // O // TODO marca exatamente onde entra a chamada real à API quando o back-end
@@ -45,20 +47,19 @@ function CadastroEmpresaPage() {
 
   async function handleSubmit(empresa) {
     // TODO: trocar por chamada real -> POST/PUT /empresa
-    navigate("/dashboard");
+    saveEmpresa(empresa); // placeholder até existir GET /empresa — ver utils/empresaStorage.js
+    navigate("/perfil-empresa");
   }
 
   return <CadastroEmpresa onSubmit={handleSubmit} />;
 }
 
-// Placeholder até o Sprint 2 (Dashboard) ser desenvolvido.
-function DashboardPlaceholder() {
-  return (
-    <div style={{ padding: 48, fontFamily: "Inter, sans-serif" }}>
-      <h1 style={{ fontFamily: "Space Grotesk, sans-serif" }}>Dashboard</h1>
-      <p style={{ color: "#5b6472" }}>Chega no Sprint 4 do backlog.</p>
-    </div>
-  );
+function PerfilEmpresaPage() {
+  const navigate = useNavigate();
+  // TODO: trocar getEmpresa() por um fetch real a GET /empresa quando o back-end existir.
+  const empresa = getEmpresa();
+
+  return <PerfilEmpresa empresa={empresa} onEditar={() => navigate("/cadastro-empresa")} />;
 }
 
 export default function App() {
@@ -76,10 +77,10 @@ export default function App() {
           }
         />
         <Route
-          path="/dashboard"
+          path="/perfil-empresa"
           element={
             <RequireAuth>
-              <DashboardPlaceholder />
+              <PerfilEmpresaPage />
             </RequireAuth>
           }
         />

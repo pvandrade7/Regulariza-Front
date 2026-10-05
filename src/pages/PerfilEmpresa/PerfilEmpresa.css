@@ -1,0 +1,121 @@
+.perfil-screen {
+  min-height: 100%;
+  display: flex;
+  justify-content: center;
+  padding: var(--space-7) var(--space-5);
+  background:
+    radial-gradient(720px 380px at 90% 0%, rgba(14, 169, 155, 0.12), transparent 60%),
+    var(--bg);
+}
+
+.perfil-card {
+  width: 100%;
+  max-width: 680px;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: var(--space-7);
+  box-shadow: var(--shadow-card);
+  height: fit-content;
+}
+
+.perfil-empty {
+  text-align: center;
+}
+
+.perfil-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--space-4);
+  margin-bottom: var(--space-6);
+}
+
+.perfil-eyebrow {
+  font-size: 12.5px;
+  color: var(--teal-400);
+  margin-bottom: var(--space-2);
+}
+
+.perfil-title {
+  font-size: 26px;
+  margin-bottom: var(--space-2);
+}
+
+.perfil-subtitle {
+  font-size: 14px;
+}
+
+.perfil-badge {
+  flex-shrink: 0;
+  background: rgba(14, 169, 155, 0.12);
+  color: var(--teal-700);
+  font-size: 13px;
+  font-weight: 600;
+  padding: 6px 14px;
+  border-radius: 999px;
+  white-space: nowrap;
+}
+
+.perfil-section {
+  margin-bottom: var(--space-6);
+  padding-bottom: var(--space-6);
+  border-bottom: 1px solid var(--border);
+}
+
+.perfil-section:last-of-type {
+  border-bottom: none;
+}
+
+.perfil-section-title {
+  font-size: 16px;
+  color: var(--teal-300);
+  margin-bottom: var(--space-4);
+}
+
+.perfil-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--space-4) var(--space-5);
+}
+
+.perfil-info-item {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.perfil-info-item.full-width {
+  grid-column: 1 / -1;
+  margin-top: var(--space-4);
+}
+
+.perfil-info-label {
+  font-size: 12.5px;
+  color: var(--text-muted);
+}
+
+.perfil-info-value {
+  font-size: 15px;
+  color: var(--text-primary);
+}
+
+.perfil-edit-btn {
+  width: auto;
+  padding-left: var(--space-6);
+  padding-right: var(--space-6);
+}
+
+@media (max-width: 560px) {
+  .perfil-card {
+    padding: var(--space-5);
+  }
+
+  .perfil-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .perfil-header {
+    flex-direction: column;
+  }
+}
