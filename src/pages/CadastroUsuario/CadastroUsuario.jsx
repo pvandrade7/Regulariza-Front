@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { isRequired, isValidEmail, isValidPasswordLength } from "../../utils/validators";
+import { isRequired, isValidEmail, isValidPasswordLength, hasNoSpaces } from "../../utils/validators";
 import "./CadastroUsuario.css";
 
 /**
@@ -35,6 +35,8 @@ export default function CadastroUsuario({ onSubmit, onNavigateToLogin }) {
       next.senha = "Crie uma senha.";
     } else if (!isValidPasswordLength(senha)) {
       next.senha = "A senha deve ter pelo menos 6 caracteres.";
+    } else if (!hasNoSpaces(senha)) {
+      next.senha = "A senha não pode conter espaços.";
     }
 
     if (!isRequired(confirmarSenha)) {
