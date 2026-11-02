@@ -2,24 +2,22 @@ import { BrowserRouter, Routes, Route, Navigate, useNavigate } from "react-route
 import Login from "./pages/Login/Login";
 import CadastroUsuario from "./pages/CadastroUsuario/CadastroUsuario";
 import CadastroEmpresa from "./pages/CadastroEmpresa/CadastroEmpresa";
+import Dashboard from "./pages/Dashboard/Dashboard";
+import Obrigacoes from "./pages/Obrigacoes/Obrigacoes";
+import Documentos from "./pages/Documentos/Documentos";
 import RequireAuth from "./routes/RequireAuth";
 import { saveToken } from "./utils/auth";
+import { saveEmpresa, getEmpresa } from "./utils/empresaStorage";
 
-// Cada função abaixo "liga" uma tela às rotas e, por enquanto, a dados falsos.
-// O // TODO marca exatamente onde entra a chamada real à API quando o back-end
-// estiver pronto (ver README para os endpoints esperados).
+// Modo de teste: ainda sem back-end de login e de empresa, tudo roda com dados de teste.
 
 function LoginPage() {
   const navigate = useNavigate();
 
-  async function handleLogin(credenciais) {
-    // TODO: trocar por chamada real -> POST /login
-    // const res = await fetch("/api/login", { method: "POST", body: JSON.stringify(credenciais) });
-    // if (!res.ok) throw new Error("invalid_credentials");
-    // const { token } = await res.json();
-    const tokenFalso = "token-de-teste";
-    saveToken(tokenFalso);
-    navigate("/cadastro-empresa");
+  async function handleLogin() {
+    saveToken("token-de-teste");
+    // Quem já cadastrou a empresa vai direto pro dashboard; os outros cadastram primeiro.
+    navigate(getEmpresa() ? "/dashboard" : "/cadastro-empresa");
   }
 
   return (
@@ -30,8 +28,7 @@ function LoginPage() {
 function CadastroUsuarioPage() {
   const navigate = useNavigate();
 
-  async function handleSubmit(usuario) {
-    // TODO: trocar por chamada real -> POST /registro
+  async function handleSubmit() {
     navigate("/login");
   }
 
@@ -44,21 +41,11 @@ function CadastroEmpresaPage() {
   const navigate = useNavigate();
 
   async function handleSubmit(empresa) {
-    // TODO: trocar por chamada real -> POST/PUT /empresa
+    saveEmpresa(empresa);
     navigate("/dashboard");
   }
 
   return <CadastroEmpresa onSubmit={handleSubmit} />;
-}
-
-// Placeholder até o Sprint 2 (Dashboard) ser desenvolvido.
-function DashboardPlaceholder() {
-  return (
-    <div style={{ padding: 48, fontFamily: "Inter, sans-serif" }}>
-      <h1 style={{ fontFamily: "Space Grotesk, sans-serif" }}>Dashboard</h1>
-      <p style={{ color: "#5b6472" }}>Chega no Sprint 4 do backlog.</p>
-    </div>
-  );
 }
 
 export default function App() {
@@ -79,7 +66,23 @@ export default function App() {
           path="/dashboard"
           element={
             <RequireAuth>
-              <DashboardPlaceholder />
+              <Dashboard />
+            </RequireAuth>
+          }
+        />
+        <Route
+          path="/obrigacoes"
+          element={
+            <RequireAuth>
+              <Obrigacoes />
+            </RequireAuth>
+          }
+        />
+        <Route
+          path="/documentos"
+          element={
+            <RequireAuth>
+              <Documentos />
             </RequireAuth>
           }
         />
