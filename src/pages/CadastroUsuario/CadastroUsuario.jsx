@@ -1,6 +1,8 @@
 import { useState } from "react";
-import { isRequired, isValidEmail, isValidPasswordLength } from "../../utils/validators";
+import { isRequired, isValidEmail, isValidPasswordLength, hasNoSpaces } from "../../utils/validators";
 import "./CadastroUsuario.css";
+
+const MSG_ESPACO = "A senha não pode conter espaços.";
 
 /**
  * Tela de Cadastro de Usuário — História 2.1/2.2
@@ -20,6 +22,20 @@ export default function CadastroUsuario({ onSubmit, onNavigateToLogin }) {
   const [formError, setFormError] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
 
+    // Senha não aceita espaço: o espaço digitado (ou colado) é removido na hora e a
+  // mensagem aparece embaixo do campo. A mensagem some quando a senha volta a ser válida.
+  function digitarSenha(campo, valor, setValor) {
+    const temEspaco = /\s/.test(valor);
+    setValor(valor.replace(/\s/g, ""));
+    setErrors((atual) => {
+      if (temEspaco) return { ...atual, [campo]: MSG_ESPACO };
+      if (atual[campo] !== MSG_ESPACO) return atual;
+      const novo = { ...atual };
+      delete novo[campo];
+      return novo;
+    });
+  }
+
   function validate() {
     const next = {};
 
@@ -35,6 +51,8 @@ export default function CadastroUsuario({ onSubmit, onNavigateToLogin }) {
       next.senha = "Crie uma senha.";
     } else if (!isValidPasswordLength(senha)) {
       next.senha = "A senha deve ter pelo menos 6 caracteres.";
+    } else if (!hasNoSpaces(senha)) {
+      next.senha = MSG_ESPACO;
     }
 
     if (!isRequired(confirmarSenha)) {
@@ -113,7 +131,7 @@ export default function CadastroUsuario({ onSubmit, onNavigateToLogin }) {
                 placeholder="••••••••"
                 autoComplete="new-password"
                 value={senha}
-                onChange={(e) => setSenha(e.target.value)}
+                onChange={(e) => digitarSenha("senha", e.target.value, setSenha)}
               />
               {errors.senha && <span className="error-text">{errors.senha}</span>}
             </div>
@@ -126,7 +144,7 @@ export default function CadastroUsuario({ onSubmit, onNavigateToLogin }) {
                 placeholder="••••••••"
                 autoComplete="new-password"
                 value={confirmarSenha}
-                onChange={(e) => setConfirmarSenha(e.target.value)}
+                onChange={(e) => digitarSenha("confirmarSenha", e.target.value, setConfirmarSenha)}
               />
               {errors.confirmarSenha && (
                 <span className="error-text">{errors.confirmarSenha}</span>

@@ -16,6 +16,11 @@ export function isValidPasswordLength(value, min = 6) {
   return value.length >= min;
 }
 
+// Regra de senha (BUG-002 / CT-007): não pode conter espaços em branco.
+export function hasNoSpaces(value) {
+  return !/\s/.test(value);
+}
+
 // Aplica a máscara 00.000.000/0000-00 enquanto o usuário digita.
 export function maskCNPJ(value) {
   const digits = value.replace(/\D/g, "").slice(0, 14);
