@@ -8,6 +8,7 @@ import Documentos from "./pages/Documentos/Documentos";
 import RequireAuth from "./routes/RequireAuth";
 import { saveToken } from "./utils/auth";
 import { saveEmpresa, getEmpresa } from "./utils/empresaStorage";
+import PerfilEmpresa from "./pages/PerfilEmpresa/PerfilEmpresa";
 
 // Modo de teste: ainda sem back-end de login e de empresa, tudo roda com dados de teste.
 
@@ -48,6 +49,11 @@ function CadastroEmpresaPage() {
   return <CadastroEmpresa onSubmit={handleSubmit} />;
 }
 
+function PerfilEmpresaPage() {
+  const navigate = useNavigate();
+  return <PerfilEmpresa empresa={getEmpresa()} onEditar={() => navigate("/cadastro-empresa")} />;
+}
+
 export default function App() {
   return (
     <BrowserRouter>
@@ -83,6 +89,14 @@ export default function App() {
           element={
             <RequireAuth>
               <Documentos />
+            </RequireAuth>
+          }
+        />
+        <Route
+          path="/perfil-empresa"
+          element={
+            <RequireAuth>
+              <PerfilEmpresaPage />
             </RequireAuth>
           }
         />
