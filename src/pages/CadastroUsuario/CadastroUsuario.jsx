@@ -1,169 +1,33 @@
-import { useState } from "react";
-import { isRequired, isValidEmail, isValidPasswordLength, hasNoSpaces } from "../../utils/validators";
-import "./CadastroUsuario.css";
-
-const MSG_ESPACO = "A senha não pode conter espaços.";
-
-/**
- * Tela de Cadastro de Usuário — História 2.1/2.2
- * Cria a conta que vai administrar a empresa (diferente do Cadastro da Empresa,
- * que vem depois, na primeira vez que o usuário loga).
- *
- * Props:
- *  - onSubmit(usuario): chamado com { nome, email, senha } validados, pronto para POST /registro.
- *  - onNavigateToLogin(): volta para a tela de login.
- */
+import { useState } from 'react';
+import './CadastroUsuario.css';
 export default function CadastroUsuario({ onSubmit, onNavigateToLogin }) {
-  const [nome, setNome] = useState("");
-  const [email, setEmail] = useState("");
-  const [senha, setSenha] = useState("");
-  const [confirmarSenha, setConfirmarSenha] = useState("");
-  const [errors, setErrors] = useState({});
-  const [formError, setFormError] = useState("");
-  const [isSubmitting, setIsSubmitting] = useState(false);
-
-    // Senha não aceita espaço: o espaço digitado (ou colado) é removido na hora e a
-  // mensagem aparece embaixo do campo. A mensagem some quando a senha volta a ser válida.
-  function digitarSenha(campo, valor, setValor) {
-    const temEspaco = /\s/.test(valor);
-    setValor(valor.replace(/\s/g, ""));
-    setErrors((atual) => {
-      if (temEspaco) return { ...atual, [campo]: MSG_ESPACO };
-      if (atual[campo] !== MSG_ESPACO) return atual;
-      const novo = { ...atual };
-      delete novo[campo];
-      return novo;
-    });
+  const [nome, setNome] = useState(''); const [email, setEmail] = useState('');
+  const [senha, setSenha] = useState(''); const [confirmacao, setConfirmacao] = useState('');
+  const [erro, setErro] = useState(''); const [loading, setLoading] = useState(false);
+  const [sucesso, setSucesso] = useState(false);
+  async function salvar(e) {
+    e.preventDefault(); setErro('');
+    if (!nome.trim() || nome.trim().length > 150) { setErro('Informe seu nome (até 150 caracteres).'); return; }
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.trim()) || email.trim().length > 255) { setErro('Informe um e-mail válido.'); return; }
+    if (senha.length < 8 || senha.length > 128) { setErro('A senha deve ter entre 8 e 128 caracteres.'); return; }
+    if (senha !== confirmacao) { setErro('A confirmação deve corresponder à senha.'); return; }
+    setLoading(true);
+    try { await onSubmit({ nome: nome.trim(), email: email.trim(), senha }); setSucesso(true); setSenha(''); setConfirmacao(''); }
+    catch (err) { setErro(err.message); } finally { setLoading(false); }
   }
-
-  function validate() {
-    const next = {};
-
-    if (!isRequired(nome)) next.nome = "Informe seu nome.";
-
-    if (!isRequired(email)) {
-      next.email = "Informe seu e-mail.";
-    } else if (!isValidEmail(email)) {
-      next.email = "Digite um e-mail válido.";
-    }
-
-    if (!isRequired(senha)) {
-      next.senha = "Crie uma senha.";
-    } else if (!isValidPasswordLength(senha)) {
-      next.senha = "A senha deve ter pelo menos 6 caracteres.";
-    } else if (!hasNoSpaces(senha)) {
-      next.senha = MSG_ESPACO;
-    }
-
-    if (!isRequired(confirmarSenha)) {
-      next.confirmarSenha = "Confirme a senha.";
-    } else if (senha !== confirmarSenha) {
-      next.confirmarSenha = "As senhas não coincidem.";
-    }
-
-    setErrors(next);
-    return Object.keys(next).length === 0;
-  }
-
-  async function handleSubmit(event) {
-    event.preventDefault();
-    setFormError("");
-
-    if (!validate()) return;
-
-    setIsSubmitting(true);
-    try {
-      await onSubmit?.({ nome: nome.trim(), email: email.trim(), senha });
-    } catch (err) {
-      setFormError(
-        err?.message === "email_ja_cadastrado"
-          ? "Esse e-mail já está cadastrado."
-          : "Não foi possível criar a conta. Tente novamente."
-      );
-    } finally {
-      setIsSubmitting(false);
-    }
-  }
-
-  return (
-    <div className="cadastro-usuario-screen">
-      <div className="cadastro-usuario-card">
-        <p className="cadastro-usuario-eyebrow">Regulariza</p>
-        <h1 className="cadastro-usuario-title">Criar conta</h1>
-        <p className="cadastro-usuario-subtitle">
-          Leva menos de um minuto. Depois disso, você cadastra sua empresa.
-        </p>
-
-        <form onSubmit={handleSubmit} noValidate>
-          {formError && <div className="form-banner">{formError}</div>}
-
-          <div className={`field ${errors.nome ? "has-error" : ""}`}>
-            <label htmlFor="nome">Nome completo</label>
-            <input
-              id="nome"
-              placeholder="Seu nome"
-              autoComplete="name"
-              value={nome}
-              onChange={(e) => setNome(e.target.value)}
-            />
-            {errors.nome && <span className="error-text">{errors.nome}</span>}
-          </div>
-
-          <div className={`field ${errors.email ? "has-error" : ""}`}>
-            <label htmlFor="email">E-mail</label>
-            <input
-              id="email"
-              type="email"
-              placeholder="voce@empresa.com.br"
-              autoComplete="email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-            />
-            {errors.email && <span className="error-text">{errors.email}</span>}
-          </div>
-
-          <div className="field-row two-cols">
-            <div className={`field ${errors.senha ? "has-error" : ""}`}>
-              <label htmlFor="senha">Senha</label>
-              <input
-                id="senha"
-                type="password"
-                placeholder="••••••••"
-                autoComplete="new-password"
-                value={senha}
-                onChange={(e) => digitarSenha("senha", e.target.value, setSenha)}
-              />
-              {errors.senha && <span className="error-text">{errors.senha}</span>}
-            </div>
-
-            <div className={`field ${errors.confirmarSenha ? "has-error" : ""}`}>
-              <label htmlFor="confirmarSenha">Confirmar senha</label>
-              <input
-                id="confirmarSenha"
-                type="password"
-                placeholder="••••••••"
-                autoComplete="new-password"
-                value={confirmarSenha}
-                onChange={(e) => digitarSenha("confirmarSenha", e.target.value, setConfirmarSenha)}
-              />
-              {errors.confirmarSenha && (
-                <span className="error-text">{errors.confirmarSenha}</span>
-              )}
-            </div>
-          </div>
-
-          <button className="btn-primary" type="submit" disabled={isSubmitting}>
-            {isSubmitting ? "Criando conta..." : "Criar conta"}
-          </button>
-        </form>
-
-        <p className="cadastro-usuario-footer">
-          Já tem conta?{" "}
-          <button type="button" className="link-btn" onClick={onNavigateToLogin}>
-            Entrar
-          </button>
-        </p>
-      </div>
-    </div>
-  );
+  return <div className="cadastro-usuario-screen"><div className="cadastro-usuario-card">
+    <p className="cadastro-usuario-eyebrow">Regulariza</p><h1 className="cadastro-usuario-title">Criar conta</h1>
+    <p className="cadastro-usuario-subtitle">Cadastre-se para gerenciar suas empresas.</p>
+    {sucesso ? <p role="status">Conta criada com sucesso. Entre com seu e-mail e senha.</p> :
+      <form onSubmit={salvar} noValidate>{erro && <div className="form-banner" role="alert">{erro}</div>}
+        <div className="field"><label htmlFor="nome">Nome</label><input id="nome" autoComplete="name" required maxLength={150} value={nome} onChange={e => setNome(e.target.value)} /></div>
+        <div className="field"><label htmlFor="email">E-mail</label><input id="email" type="email" autoComplete="username" required maxLength={255} value={email} onChange={e => setEmail(e.target.value)} /></div>
+        <div className="field-row two-cols">
+          <div className="field"><label htmlFor="senha">Senha</label><input id="senha" type="password" autoComplete="new-password" minLength={8} maxLength={128} required value={senha} onChange={e => setSenha(e.target.value)} /><span className="hint">Entre 8 e 128 caracteres.</span></div>
+          <div className="field"><label htmlFor="confirmacao">Confirmar senha</label><input id="confirmacao" type="password" autoComplete="new-password" maxLength={128} required value={confirmacao} onChange={e => setConfirmacao(e.target.value)} /></div>
+        </div>
+        <button className="btn-primary" disabled={loading}>{loading ? 'Criando conta...' : 'Criar conta'}</button>
+      </form>}
+    <p className="cadastro-usuario-footer"><button className="link-btn" onClick={onNavigateToLogin}>Entrar</button></p>
+  </div></div>;
 }

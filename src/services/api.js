@@ -1,97 +1,51 @@
-// Camada de comunicação com o back-end. Nenhuma tela chama fetch direto.
-// O endereço e os interruptores vêm do arquivo .env.
-
-import { getToken } from "../utils/auth";
-
-const BASE_URL = import.meta.env.VITE_API_URL || "http://localhost:3000";
-
-// Interruptores: desligados, o app funciona com dados de teste, sem back-end.
-export const USE_API_OBRIGACOES = import.meta.env.VITE_API_OBRIGACOES === "true"; // inclui o dashboard
-export const USE_API_DOCUMENTOS = import.meta.env.VITE_API_DOCUMENTOS === "true";
-export const USE_API_CHAT = import.meta.env.VITE_API_CHAT === "true";
-export const USE_API_AVISOS = import.meta.env.VITE_API_AVISOS === "true";
-
-// Erro com o status HTTP. `status` é 0 quando o servidor não respondeu.
+let csrfToken = null;
+export function setCsrfToken(token) { csrfToken = token; }
+const BASE_URL = (import.meta.env?.VITE_API_URL || "http://localhost:3000").replace(/\/$/, "");
 export class ApiError extends Error {
-  constructor(message, status) {
-    super(message);
-    this.status = status;
-  }
+  constructor(message, status) { super(message); this.status = status; }
 }
-
-async function request(path, { method = "GET", body, auth = false } = {}) {
-  const headers = { "Content-Type": "application/json" };
-  if (auth) {
-    const token = getToken();
-    if (token) headers.Authorization = `Bearer ${token}`;
-  }
-
+export async function request(path, { method = "GET", body } = {}) {
   let res;
+  const headers = body === undefined ? { Accept: 'application/json' } : { Accept: 'application/json', 'Content-Type': 'application/json' };
+  if (!['GET', 'HEAD'].includes(method)) {
+    headers['Content-Type'] = 'application/json';
+    if (csrfToken) headers['X-CSRF-Token'] = csrfToken;
+  }
   try {
     res = await fetch(`${BASE_URL}${path}`, {
       method,
       headers,
-      body: body ? JSON.stringify(body) : undefined,
+      credentials: "include",
+      body: body === undefined ? undefined : JSON.stringify(body),
+      signal: AbortSignal.timeout(15000),
     });
   } catch {
-    throw new ApiError(
-      "Não foi possível conectar ao servidor. Verifique se o back-end está rodando.",
-      0
-    );
+    throw new ApiError("Não foi possível conectar ao servidor ou o tempo de resposta foi excedido.", 0);
   }
-
-  let data = null;
-  try {
-    data = await res.json();
-  } catch {
-    // resposta sem corpo JSON
+  if (res.status === 204) return null;
+  let data;
+  try { data = await res.json(); } catch {
+    throw new ApiError("O servidor retornou uma resposta inválida.", res.status);
   }
-
-  if (!res.ok) {
-    // O back envia { mensagem } e, nos erros de validação, também { erros: [...] }.
-    const detalhes = Array.isArray(data?.erros) && data.erros.length ? data.erros.join(" ") : null;
-    throw new ApiError(detalhes || data?.mensagem || "Erro inesperado no servidor.", res.status);
+  if (res.status === 401 && path !== '/auth/login' && typeof window !== 'undefined') {
+    setCsrfToken(null);
+    window.dispatchEvent(new Event('regulariza:unauthorized'));
   }
-
+  if (!res.ok) throw new ApiError(data?.erros?.join(" ") || data?.mensagem || "Erro no servidor.", res.status);
   return data;
 }
-
-// ---------- Obrigações e dashboard ----------
-
-// GET /obrigacoes/empresa -> lista de obrigações da empresa (o front filtra por status na tela).
-export function listarObrigacoesEmpresa(empresaId) {
-  const query = empresaId ? `?empresaId=${encodeURIComponent(empresaId)}` : "";
-  return request(`/obrigacoes/empresa${query}`, { auth: true });
-}
-
-// PATCH /obrigacoes/empresa/:id com { status?, responsavel? } -> obrigação atualizada
-export function atualizarObrigacaoEmpresa(id, campos) {
-  return request(`/obrigacoes/empresa/${id}`, { method: "PATCH", body: campos, auth: true });
-}
-
-// Esperado: { total, pendentes, atrasadas, concluidas, proximosVencimentos: [obrigação, ...] }
-export function buscarDashboard() {
-  return request("/dashboard", { auth: true });
-}
-
-// ---------- Documentos ----------
-
-export function listarDocumentosEmpresa(empresaId) {
-  return request(`/empresas/${empresaId}/documentos`, { auth: true });
-}
-
-export function criarDocumentoEmpresa(empresaId, dados) {
-  return request(`/empresas/${empresaId}/documentos`, { method: "POST", body: dados, auth: true });
-}
-
-// ---------- Chat e avisos ----------
-
-// POST /chat com { mensagem } -> { resposta }
-export function enviarMensagemChat(mensagem) {
-  return request("/chat", { method: "POST", body: { mensagem }, auth: true });
-}
-
-// GET /avisos -> [{ id, titulo, texto }]
-export function listarAvisosApi() {
-  return request("/avisos", { auth: true });
-}
+const empresaPath = id => {
+  if (!id) throw new ApiError("Selecione ou cadastre uma empresa para continuar.", 400);
+  return `/empresas/${encodeURIComponent(id)}`;
+};
+export const listarRegimes = () => request("/regimes-juridicos");
+export const criarUsuario = dados => request("/auth/register", { method: "POST", body: dados });
+export const listarEmpresas = () => request('/empresas');
+export const fazerLogin = dados => request('/auth/login', { method: 'POST', body: dados });
+export const fazerLogout = () => request('/auth/logout', { method: 'POST', body: {} });
+export const consultarSessao = () => request('/auth/me');
+export const buscarEmpresa = id => request(empresaPath(id));
+export const salvarEmpresa = (dados, id) => request(id ? empresaPath(id) : "/empresas", { method: id ? "PATCH" : "POST", body: dados });
+export const listarObrigacoesEmpresa = id => request(`${empresaPath(id)}/obrigacoes`);
+export const sincronizarObrigacoes = (id, dataBase) => request(`${empresaPath(id)}/obrigacoes/sincronizar`, { method: "POST", body: { dataBase } });
+export const atualizarObrigacaoEmpresa = (empresaId, id, status) => request(`${empresaPath(empresaId)}/obrigacoes/${encodeURIComponent(id)}/status`, { method: "PATCH", body: { status } });

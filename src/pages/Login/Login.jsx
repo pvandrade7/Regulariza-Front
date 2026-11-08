@@ -1,134 +1,56 @@
-import { useState } from "react";
-import {
-  isRequired,
-  isValidEmail,
-  isValidPasswordLength,
-  hasNoSpaces,
-} from "../../utils/validators";
-import "./Login.css";
-
-const MSG_ESPACO = "A senha não pode conter espaços.";
-
-/**
- * Tela de Login — História 2.1/2.2
- *
- * Props:
- *  - onLogin(credentials): chamado com { email, senha } após validação bem-sucedida.
- *    Deve retornar (ou lançar) para indicar erro de autenticação, ex.:
- *      onLogin={(c) => api.login(c)}  // rejeita a Promise em caso de credenciais inválidas
- *  - onNavigateToCadastro(): navegação para a criação de conta, se aplicável.
- */
-export default function Login({ onLogin, onNavigateToCadastro }) {
-  const [email, setEmail] = useState("");
-  const [senha, setSenha] = useState("");
-  const [errors, setErrors] = useState({});
-  const [formError, setFormError] = useState("");
-  const [isSubmitting, setIsSubmitting] = useState(false);
-
-    // Senha não aceita espaço: o espaço digitado (ou colado) é removido na hora e a
-  // mensagem aparece embaixo do campo. A mensagem some quando a senha volta a ser válida.
-  function digitarSenha(valor) {
-    const temEspaco = /\s/.test(valor);
-    setSenha(valor.replace(/\s/g, ""));
-    setErrors((atual) => {
-      if (temEspaco) return { ...atual, senha: MSG_ESPACO };
-      if (atual.senha !== MSG_ESPACO) return atual;
-      const novo = { ...atual };
-      delete novo.senha;
-      return novo;
-    });
-  }
-
-  function validate() {
-    const next = {};
-
-    if (!isRequired(email)) {
-      next.email = "Informe seu e-mail.";
-    } else if (!isValidEmail(email)) {
-      next.email = "Digite um e-mail válido.";
+import { useEffect, useState } from 'react';
+import { listarEmpresas } from '../../services/api';
+import './Login.css';
+export default function Login({ usuario, onLogin, onLogout, onSelecionar, onNavigateToCadastro }) {
+  const [email, setEmail] = useState('');
+  const [senha, setSenha] = useState('');
+  const [empresas, setEmpresas] = useState(null);
+  const [empresaId, setEmpresaId] = useState('');
+  const [erro, setErro] = useState('');
+  const [loading, setLoading] = useState(false);
+  useEffect(() => {
+    let ativo = true;
+    if (usuario) listarEmpresas().then(lista => {
+      if (ativo) { setEmpresas(lista); setEmpresaId(lista[0]?.id || ''); }
+    }).catch(err => ativo && setErro(err.message));
+    return () => { ativo = false; };
+  }, [usuario]);
+  async function entrar(e) {
+    e.preventDefault(); setErro('');
+    if (!email.trim() || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.trim()) || senha.length < 8 || senha.length > 128) {
+      setErro('Informe e-mail válido e senha de 8 a 128 caracteres.'); return;
     }
-
-    if (!isRequired(senha)) {
-      next.senha = "Informe sua senha.";
-    } else if (!isValidPasswordLength(senha)) {
-      next.senha = "A senha deve ter pelo menos 6 caracteres.";
-    } else if (!hasNoSpaces(senha)) {
-      next.senha = MSG_ESPACO;
-    }
-
-    setErrors(next);
-    return Object.keys(next).length === 0;
+    setLoading(true);
+    try { await onLogin({ email: email.trim(), senha }); setSenha(''); }
+    catch (err) { setErro(err.message); } finally { setLoading(false); }
   }
-
-  async function handleSubmit(event) {
-    event.preventDefault();
-    setFormError("");
-
-    if (!validate()) return;
-
-    setIsSubmitting(true);
-    try {
-      await onLogin?.({ email: email.trim(), senha });
-    } catch (err) {
-      setFormError(
-        err?.message === "invalid_credentials"
-          ? "E-mail ou senha incorretos."
-          : "Não foi possível entrar. Tente novamente."
-      );
-    } finally {
-      setIsSubmitting(false);
-    }
+  async function sair() {
+    setLoading(true); setErro('');
+    try { await onLogout(); setEmpresas(null); setEmpresaId(''); }
+    catch (err) { setErro(err.message); } finally { setLoading(false); }
   }
-
-  return (
-    <div className="login-screen">
-      <div className="login-card">
-        <div className="login-mark" aria-hidden="true" />
-        <p className="login-eyebrow">Regulariza</p>
-        <h1 className="login-title">Entrar</h1>
-        <p className="login-subtitle">Acompanhe as obrigações da sua empresa em um só lugar.</p>
-
-        <form onSubmit={handleSubmit} noValidate>
-          {formError && <div className="form-banner">{formError}</div>}
-
-          <div className={`field ${errors.email ? "has-error" : ""}`}>
-            <label htmlFor="email">E-mail</label>
-            <input
-              id="email"
-              type="email"
-              autoComplete="email"
-              placeholder="voce@empresa.com.br"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-            />
-            {errors.email && <span className="error-text">{errors.email}</span>}
-          </div>
-
-          <div className={`field ${errors.senha ? "has-error" : ""}`}>
-            <label htmlFor="senha">Senha</label>
-            <input
-              id="senha"
-              type="password"
-              autoComplete="current-password"
-              placeholder="••••••••"
-              value={senha}
-              onChange={(e) => digitarSenha(e.target.value)}
-            />
-            {errors.senha && <span className="error-text">{errors.senha}</span>}
-          </div>
-
-          <button className="btn-primary" type="submit" disabled={isSubmitting}>
-            {isSubmitting ? "Entrando..." : "Entrar"}
-          </button>
-        </form>
-
-        <p className="login-footer">
-          Ainda não tem conta?{" "}
-          <button type="button" className="link-btn" onClick={onNavigateToCadastro}>
-            Criar conta
-          </button>
-        </p>
-      </div>
-    </div>
-  );
+  return <div className="login-screen"><div className="login-card">
+    <div className="login-mark" aria-hidden="true" /><p className="login-eyebrow">Regulariza</p>
+    <h1 className="login-title">{usuario ? 'Selecione sua empresa' : 'Entrar'}</h1>
+    <p className="login-subtitle">Acompanhe as obrigações da sua empresa em um só lugar.</p>
+    {erro && <div className="form-banner" role="alert">{erro}</div>}
+    {usuario ? <>
+      <p>Olá, {usuario.nome}.</p>
+      {empresas === null ? <p>{erro ? 'Recarregue a página para tentar consultar novamente.' : 'Carregando empresas...'}</p> : <form onSubmit={e => { e.preventDefault(); onSelecionar(empresaId); }}>
+        <div className="field"><label htmlFor="empresa">Empresa</label>
+          <select id="empresa" value={empresaId} onChange={e => setEmpresaId(e.target.value)}>
+            <option value="">Cadastrar nova empresa</option>{empresas.map(emp => <option key={emp.id} value={emp.id}>{emp.nome}</option>)}
+          </select></div>
+        <button className="btn-primary">Continuar</button>
+      </form>}
+      <p className="login-footer"><button className="link-btn" onClick={sair} disabled={loading}>Sair da conta</button></p>
+    </> : <>
+      <form onSubmit={entrar} noValidate>
+        <div className="field"><label htmlFor="email">E-mail</label><input id="email" type="email" autoComplete="username" maxLength={255} required value={email} onChange={e => setEmail(e.target.value)} /></div>
+        <div className="field"><label htmlFor="senha">Senha</label><input id="senha" type="password" autoComplete="current-password" maxLength={128} required value={senha} onChange={e => setSenha(e.target.value)} /></div>
+        <button className="btn-primary" disabled={loading}>{loading ? 'Entrando...' : 'Entrar'}</button>
+      </form>
+      <p className="login-footer"><button className="link-btn" onClick={onNavigateToCadastro}>Criar conta</button></p>
+    </>}
+  </div></div>;
 }

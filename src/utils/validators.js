@@ -31,13 +31,26 @@ export function maskCNPJ(value) {
     .replace(/(\d{4})(\d)/, "$1-$2");
 }
 
-// Validação estrutural do CNPJ (14 dígitos). Não recalcula os dígitos
-// verificadores — suficiente para o MVP, podendo ser reforçada no back-end.
-export function isValidCNPJ(value) {
-  const digits = value.replace(/\D/g, "");
-  if (digits.length !== 14) return false;
-  if (/^(\d)\1{13}$/.test(digits)) return false; // todos os dígitos iguais
+export function isValidCPF(value) {
+  const cpf = onlyDigits(value);
+  if (cpf.length !== 11 || /^(\d)\1{10}$/.test(cpf)) return false;
+  for (let tamanho = 9; tamanho <= 10; tamanho++) {
+    let soma = 0;
+    for (let i = 0; i < tamanho; i++) soma += Number(cpf[i]) * (tamanho + 1 - i);
+    const resto = (soma * 10) % 11;
+    if ((resto === 10 ? 0 : resto) !== Number(cpf[tamanho])) return false;
+  }
   return true;
+}
+export function isValidCNPJ(value) {
+  const cnpj = onlyDigits(value);
+  if (cnpj.length !== 14 || /^(\d)\1{13}$/.test(cnpj)) return false;
+  const digito = (base, pesos) => {
+    const resto = pesos.reduce((soma, peso, i) => soma + Number(base[i]) * peso, 0) % 11;
+    return resto < 2 ? 0 : 11 - resto;
+  };
+  return digito(cnpj, [5,4,3,2,9,8,7,6,5,4,3,2]) === Number(cnpj[12]) &&
+    digito(cnpj, [6,5,4,3,2,9,8,7,6,5,4,3,2]) === Number(cnpj[13]);
 }
 
 // Mantém apenas dígitos, usado no campo "Número de funcionários".
@@ -47,5 +60,5 @@ export function onlyDigits(value) {
 
 export function isPositiveInteger(value) {
   if (value === "") return false;
-  return /^\d+$/.test(value) && Number(value) >= 0;
+  return /^\d+$/.test(value) && Number.isSafeInteger(Number(value)) && Number(value) >= 0 && Number(value) <= 2147483647;
 }

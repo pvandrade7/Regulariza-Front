@@ -9,12 +9,16 @@ import {
 import "./ObrigacaoModal.css";
 
 const ROTULO_STATUS = {
+  em_andamento: "Em andamento",
+  desconhecido: "Status desconhecido",
   pendente: "Pendente",
   atrasada: "Atrasada",
   concluida: "Concluída",
 };
 
 const COR_STATUS = {
+  em_andamento: "amarelo",
+  desconhecido: "neutro",
   pendente: "amarelo",
   atrasada: "vermelho",
   concluida: "verde",
@@ -30,14 +34,12 @@ const COR_STATUS = {
  *  - onFechar(): fecha o painel.
  */
 export default function ObrigacaoModal({ obrigacao, onSalvar, onFechar }) {
-  const [responsavel, setResponsavel] = useState(obrigacao.responsavel ?? "");
   const [salvando, setSalvando] = useState(false);
   const [erro, setErro] = useState("");
 
   const status = statusDaObrigacao(obrigacao);
   const dias = diasAte(obrigacao.vencimento);
   const concluida = status === "concluida";
-  const responsavelMudou = responsavel.trim() !== (obrigacao.responsavel ?? "");
 
   // Esc fecha o painel; enquanto ele está aberto, a página de trás não rola.
   useEffect(() => {
@@ -69,10 +71,6 @@ export default function ObrigacaoModal({ obrigacao, onSalvar, onFechar }) {
     salvar({ status: concluida ? "pendente" : "concluida" });
   }
 
-  function salvarResponsavel() {
-    salvar({ responsavel: responsavel.trim() });
-  }
-
   return (
     <div className="modal-fundo" onClick={onFechar}>
       <div
@@ -87,7 +85,7 @@ export default function ObrigacaoModal({ obrigacao, onSalvar, onFechar }) {
             <h2 id="modal-titulo" className="modal-titulo">
               {obrigacao.nome}
             </h2>
-            <span className={`badge ${COR_STATUS[status]}`}>{ROTULO_STATUS[status]}</span>
+            <span className={`badge ${COR_STATUS[status]}`}>{status === "desconhecido" ? `Status: ${obrigacao.statusOriginal ?? "não informado"}` : ROTULO_STATUS[status]}</span>
           </div>
           <button type="button" className="modal-fechar" aria-label="Fechar" onClick={onFechar}>
             ×
@@ -138,21 +136,19 @@ export default function ObrigacaoModal({ obrigacao, onSalvar, onFechar }) {
 
           <section className="modal-secao">
             <div className="field modal-responsavel">
-              <label htmlFor="responsavel">Responsável (opcional)</label>
+              <label htmlFor="responsavel">Responsável (sem suporte no backend)</label>
               <div className="modal-responsavel-linha">
                 <input
                   id="responsavel"
                   placeholder="Nome de quem cuida desta obrigação"
                   maxLength={150}
-                  value={responsavel}
-                  onChange={(e) => setResponsavel(e.target.value)}
-                  disabled={salvando}
+                  value={obrigacao.responsavel ?? ""}
+                  disabled
                 />
                 <button
                   type="button"
                   className="btn-outline"
-                  onClick={salvarResponsavel}
-                  disabled={salvando || !responsavelMudou}
+                  disabled
                 >
                   Salvar
                 </button>
@@ -162,6 +158,7 @@ export default function ObrigacaoModal({ obrigacao, onSalvar, onFechar }) {
         </div>
 
         <footer className="modal-rodape">
+          <button type="button" className="btn-outline" disabled={salvando || obrigacao.status === "em_andamento"} onClick={() => salvar({ status: "em_andamento" })}>Em andamento</button>
           <button type="button" className="btn-outline" onClick={onFechar}>
             Fechar
           </button>

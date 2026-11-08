@@ -1,3 +1,4 @@
+import { useEffect, useState } from "react";
 import { BrowserRouter, Routes, Route, Navigate, useNavigate } from "react-router-dom";
 import Login from "./pages/Login/Login";
 import CadastroUsuario from "./pages/CadastroUsuario/CadastroUsuario";
@@ -6,57 +7,63 @@ import Dashboard from "./pages/Dashboard/Dashboard";
 import Obrigacoes from "./pages/Obrigacoes/Obrigacoes";
 import Documentos from "./pages/Documentos/Documentos";
 import RequireAuth from "./routes/RequireAuth";
-import { saveToken } from "./utils/auth";
-import { saveEmpresa, getEmpresa } from "./utils/empresaStorage";
+import AuthProvider from './context/AuthProvider';
+import { useAuth } from './hooks/useAuth';
+import { buscarEmpresa, criarUsuario } from "./services/api";
+import { saveEmpresaId, getEmpresaId, setEmpresaAtual } from "./utils/empresaStorage";
+import { salvarEmpresaComObrigacoes } from "./services/cadastroEmpresa";
 import PerfilEmpresa from "./pages/PerfilEmpresa/PerfilEmpresa";
-
-// Modo de teste: ainda sem back-end de login e de empresa, tudo roda com dados de teste.
 
 function LoginPage() {
   const navigate = useNavigate();
-
-  async function handleLogin() {
-    saveToken("token-de-teste");
-    // Quem já cadastrou a empresa vai direto pro dashboard; os outros cadastram primeiro.
-    navigate(getEmpresa() ? "/dashboard" : "/cadastro-empresa");
+  const { usuario, carregando, entrar, sair } = useAuth();
+  if (carregando) return <p className="page-message">Verificando sessão...</p>;
+  function selecionar(empresaId) {
+    saveEmpresaId(empresaId);
+    navigate(empresaId ? '/dashboard' : '/cadastro-empresa', { replace: true });
   }
-
-  return (
-    <Login onLogin={handleLogin} onNavigateToCadastro={() => navigate("/cadastro-usuario")} />
-  );
+  return <Login usuario={usuario} onLogin={entrar} onLogout={sair} onSelecionar={selecionar} onNavigateToCadastro={() => navigate('/cadastro-usuario')} />;
 }
-
 function CadastroUsuarioPage() {
   const navigate = useNavigate();
-
-  async function handleSubmit() {
-    navigate("/login");
-  }
-
-  return (
-    <CadastroUsuario onSubmit={handleSubmit} onNavigateToLogin={() => navigate("/login")} />
-  );
+  return <CadastroUsuario onSubmit={criarUsuario} onNavigateToLogin={() => navigate('/login')} />;
 }
-
+function EmpresaCarregada({ children }) {
+  const [empresa, setEmpresa] = useState(null);
+  const [erro, setErro] = useState("");
+  const id = getEmpresaId();
+  useEffect(() => {
+    let ativo = true;
+    if (id) buscarEmpresa(id).then(dados => {
+      if (ativo) { setEmpresaAtual(dados); setEmpresa(dados); }
+    }).catch(err => ativo && setErro(err.message));
+    return () => { ativo = false; };
+  }, [id]);
+  if (!id) return children(null);
+  if (erro) return <div className="form-banner" role="alert">{erro} <a href="/login">Voltar à seleção</a></div>;
+  if (!empresa) return <p className="page-message">Carregando empresa...</p>;
+  return children(empresa);
+}
 function CadastroEmpresaPage() {
   const navigate = useNavigate();
-
-  async function handleSubmit(empresa) {
-    saveEmpresa(empresa);
-    navigate("/dashboard");
+  async function handleSubmit(dados) {
+    const resultado = await salvarEmpresaComObrigacoes(dados, getEmpresaId());
+    navigate("/dashboard", { replace: true, state: resultado });
   }
-
-  return <CadastroEmpresa onSubmit={handleSubmit} />;
+  return <EmpresaCarregada>{empresa => <CadastroEmpresa key={empresa?.id || "nova"} empresa={empresa} onSubmit={handleSubmit} />}</EmpresaCarregada>;
 }
-
 function PerfilEmpresaPage() {
   const navigate = useNavigate();
-  return <PerfilEmpresa empresa={getEmpresa()} onEditar={() => navigate("/cadastro-empresa")} />;
+  return <EmpresaCarregada>{empresa => <PerfilEmpresa empresa={empresa} onEditar={() => navigate("/cadastro-empresa")} />}</EmpresaCarregada>;
+}
+function DadosEmpresa({ children }) {
+  if (!getEmpresaId()) return <Navigate to="/cadastro-empresa" replace />;
+  return <EmpresaCarregada>{() => children}</EmpresaCarregada>;
 }
 
 export default function App() {
   return (
-    <BrowserRouter>
+    <AuthProvider><BrowserRouter>
       <Routes>
         <Route path="/login" element={<LoginPage />} />
         <Route path="/cadastro-usuario" element={<CadastroUsuarioPage />} />
@@ -72,7 +79,7 @@ export default function App() {
           path="/dashboard"
           element={
             <RequireAuth>
-              <Dashboard />
+              <DadosEmpresa><Dashboard /></DadosEmpresa>
             </RequireAuth>
           }
         />
@@ -80,7 +87,7 @@ export default function App() {
           path="/obrigacoes"
           element={
             <RequireAuth>
-              <Obrigacoes />
+              <DadosEmpresa><Obrigacoes /></DadosEmpresa>
             </RequireAuth>
           }
         />
@@ -88,7 +95,7 @@ export default function App() {
           path="/documentos"
           element={
             <RequireAuth>
-              <Documentos />
+              <DadosEmpresa><Documentos /></DadosEmpresa>
             </RequireAuth>
           }
         />
@@ -102,6 +109,6 @@ export default function App() {
         />
         <Route path="*" element={<Navigate to="/login" replace />} />
       </Routes>
-    </BrowserRouter>
+    </BrowserRouter></AuthProvider>
   );
 }

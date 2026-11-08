@@ -4,6 +4,8 @@
 function partes(resumo) {
   return [
     { chave: "concluidas", valor: Number(resumo.concluidas) || 0 },
+    { chave: "emAndamento", valor: Number(resumo.emAndamento) || 0 },
+    { chave: "desconhecidas", valor: Number(resumo.desconhecidas) || 0 },
     { chave: "pendentes", valor: Number(resumo.pendentes) || 0 },
     { chave: "atrasadas", valor: Number(resumo.atrasadas) || 0 },
   ];

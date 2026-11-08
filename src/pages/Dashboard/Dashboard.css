@@ -373,3 +373,5 @@
     grid-template-columns: 1fr;
   }
 }
+.dash-anel-seg.emAndamento { stroke: #d79b20; }
+.dash-anel-seg.desconhecidas { stroke: #89939e; }

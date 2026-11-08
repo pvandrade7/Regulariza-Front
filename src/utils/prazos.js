@@ -68,8 +68,9 @@ export function corDoPrazo(dias) {
 // Status que a tela mostra: "concluida", "atrasada" (pendente com data passada) ou "pendente".
 export function statusDaObrigacao(obrigacao, hoje = new Date()) {
   if (obrigacao.status === "concluida") return "concluida";
+  if (!["pendente", "em_andamento"].includes(obrigacao.status)) return "desconhecido";
   const dias = diasAte(obrigacao.vencimento, hoje);
-  return dias !== null && dias < 0 ? "atrasada" : "pendente";
+  return dias !== null && dias < 0 ? "atrasada" : obrigacao.status;
 }
 
 // filtro: "todas" | "pendente" | "atrasada" | "concluida"
@@ -79,12 +80,14 @@ export function filtrarObrigacoes(lista, filtro, hoje = new Date()) {
 }
 
 export function contarPorStatus(lista, hoje = new Date()) {
-  const contagem = { total: lista.length, pendentes: 0, atrasadas: 0, concluidas: 0 };
+  const contagem = { total: lista.length, pendentes: 0, atrasadas: 0, concluidas: 0, emAndamento: 0, desconhecidas: 0 };
   for (const o of lista) {
     const status = statusDaObrigacao(o, hoje);
     if (status === "concluida") contagem.concluidas += 1;
     else if (status === "atrasada") contagem.atrasadas += 1;
-    else contagem.pendentes += 1;
+    else if (status === "pendente") contagem.pendentes += 1;
+    else if (status === "em_andamento") contagem.emAndamento += 1;
+    else contagem.desconhecidas += 1;
   }
   return contagem;
 }
@@ -92,7 +95,7 @@ export function contarPorStatus(lista, hoje = new Date()) {
 // Não concluídas, da data mais próxima (ou já vencida) para a mais distante.
 export function proximosVencimentos(lista, hoje = new Date(), limite = 5) {
   return lista
-    .filter((o) => statusDaObrigacao(o, hoje) !== "concluida")
+    .filter((o) => ["pendente", "em_andamento"].includes(statusDaObrigacao(o, hoje)) && diasAte(o.vencimento, hoje) !== null)
     .sort((a, b) => {
       const da = diasAte(a.vencimento, hoje);
       const db = diasAte(b.vencimento, hoje);
@@ -109,9 +112,11 @@ export function situacaoGeral(contagem, naoConcluidas = [], hoje = new Date()) {
   if (contagem.total === 0) {
     return { nivel: "neutro", texto: "Nenhuma obrigação cadastrada" };
   }
+  if (contagem.desconhecidas > 0) return { nivel: "neutro", texto: "Há status não reconhecidos; revise as obrigações" };
   if (contagem.atrasadas > 0) {
     return { nivel: "vermelho", texto: "Há obrigações atrasadas" };
   }
+  if (naoConcluidas.some(o => diasAte(o.vencimento, hoje) === null)) return { nivel: "neutro", texto: "Há obrigações sem vencimento definido" };
   const apertado = naoConcluidas.some((o) => {
     const dias = diasAte(o.vencimento, hoje);
     return dias !== null && dias <= LIMITE_VERMELHO_DIAS;

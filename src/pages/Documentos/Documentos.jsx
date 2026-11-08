@@ -104,7 +104,8 @@ export default function Documentos() {
         <section className="app-card">
           <h2 className="app-card-title">Cadastrar documento</h2>
 
-          <form onSubmit={handleSubmit} noValidate>
+          <p>Metadados, associação a obrigações e upload ainda não possuem suporte no backend. Nenhum documento será salvo localmente.</p>
+          <form onSubmit={handleSubmit} noValidate><fieldset disabled style={{ border: 0, padding: 0 }}>
             {erroForm && <div className="form-banner">{erroForm}</div>}
             {sucesso && <div className="doc-sucesso">{sucesso}</div>}
 
@@ -182,7 +183,7 @@ export default function Documentos() {
             <button className="btn-primary" type="submit" disabled={salvando}>
               {salvando ? "Salvando..." : "Cadastrar documento"}
             </button>
-          </form>
+          </fieldset></form>
         </section>
 
         <section className="app-card">

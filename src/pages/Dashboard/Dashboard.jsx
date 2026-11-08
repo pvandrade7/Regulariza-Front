@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 import AppLayout from "../../components/AppLayout/AppLayout";
 import ChatFlutuante from "../../components/ChatFlutuante/ChatFlutuante";
 import Icon from "../../components/Icon/Icon";
@@ -63,6 +63,7 @@ function Anel({ resumo }) {
  * cores por urgência (vermelho / amarelo / verde), avisos e o chat flutuante com a IA.
  */
 export default function Dashboard() {
+  const location = useLocation();
   const [dados, setDados] = useState(null);
   const [erro, setErro] = useState("");
   const [avisos, setAvisos] = useState([]);
@@ -84,6 +85,9 @@ export default function Dashboard() {
 
   return (
     <AppLayout titulo="Dashboard">
+      {location.state?.mensagem && <p role="status">{location.state.mensagem}</p>}
+      {location.state?.avisoSincronizacao && <div className="form-banner" role="alert">{location.state.avisoSincronizacao} <Link to="/obrigacoes">Abrir Central de Obrigações</Link></div>}
+      <p className="hint">Após editar o perfil, sincronize as obrigações na Central de Obrigações.</p>
       {erro && <div className="form-banner">Não foi possível carregar o dashboard: {erro}</div>}
       {!dados && !erro && <p className="page-message">Carregando...</p>}
 
@@ -118,6 +122,8 @@ export default function Dashboard() {
                 valor={dados.resumo.atrasadas}
                 tom="alerta"
               />
+              <CardNumero icone="pendentes" rotulo="Em andamento" valor={dados.resumo.emAndamento} />
+              <CardNumero icone="total" rotulo="Status desconhecido" valor={dados.resumo.desconhecidas} />
               <CardNumero icone="concluidas" rotulo="Concluídas" valor={dados.resumo.concluidas} />
             </section>
 
@@ -130,7 +136,7 @@ export default function Dashboard() {
               </div>
 
               {dados.proximos.length === 0 ? (
-                <p className="empty-state">Nenhuma obrigação em aberto. Tudo em dia!</p>
+                <p className="empty-state">Nenhum vencimento futuro conhecido. Consulte todas as obrigações, inclusive atrasadas ou sem data.</p>
               ) : (
                 <ul className="dash-tabela">
                   <li className="dash-tabela-cab" aria-hidden="true">
@@ -164,6 +170,8 @@ export default function Dashboard() {
               <h2 className="app-card-title">Conformidade</h2>
               <Anel resumo={dados.resumo} />
               <ul className="dash-legenda">
+                <li>Em andamento<strong>{dados.resumo.emAndamento}</strong></li>
+                <li>Status desconhecido<strong>{dados.resumo.desconhecidas}</strong></li>
                 <li>
                   <span className="dash-ponto verde" aria-hidden="true" />
                   Concluídas
@@ -185,7 +193,7 @@ export default function Dashboard() {
             <section className="app-card">
               <h2 className="app-card-title">Avisos regulatórios</h2>
               {avisos.length === 0 ? (
-                <p className="empty-state">Nenhum aviso no momento.</p>
+                <p className="empty-state">Avisos regulatórios ainda não integrados.</p>
               ) : (
                 <ul className="dash-avisos">
                   {avisos.map((a) => (

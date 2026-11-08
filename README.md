@@ -1,28 +1,22 @@
+# Regulariza — Frontend
 
-## Como rodar o projeto
+React + Vite. Node validado: 22.19.0.
 
-### Pré-requisitos
+```sh
+npm install
+npm run dev
+```
 
-- Baixar o node.js
+`VITE_API_URL=http://localhost:3000` (padrão). Use o mesmo hostname nos dois serviços em desenvolvimento; não misture localhost e 127.0.0.1 por causa do SameSite. Nunca exponha DATABASE_URL ou chaves privadas em variáveis VITE_. Reinicie Vite após mudar a configuração.
 
-### Passo a passo
+Cadastre nome/e-mail/senha, entre com e-mail/senha e selecione/cadastre sua empresa. A sessão vem do cookie HttpOnly, é recuperada em `/auth/me` e revogada por logout HTTP. O frontend não armazena senhas/tokens no storage; apenas o ID temporário da empresa selecionada, que é revalidado pelo backend.
 
-1. Clone o repositório e entre na pasta:
-   git clone <URL-do-repositório>
-   cd nome-da-pasta
+Usuários antigos sem senha permanecem preservados, mas bloqueados até ativação verificada. Documentos continuam indisponíveis por falta de suporte no backend; chat e cálculo demonstrativo de prazos mantêm suas limitações anteriores.
 
-2. Instale as dependências:
-   npm install
-   npm install react-router-dom
+```sh
+npm test
+npm run lint
+npm run build
+```
 
-3. Rode o projeto:
-   npm run dev
-
-4. Abra no navegador o endereço que aparecer no terminal (normalmente `http://localhost:5173`).
-
-### Rotas disponíveis
-| `/login` | Login |
-| `/cadastro-usuario` | Criar conta |
-| `/cadastro-empresa` | Cadastro da empresa (exige login) |
-| `/dashboard` | Placeholder (exige login) |
-
+Layout e rotas de navegação foram preservados. Veja o [relatório de autenticação](../../RELATORIO_AUTENTICACAO.md) para testes, configuração de produção e limitações.

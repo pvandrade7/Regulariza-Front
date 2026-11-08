@@ -7,7 +7,7 @@ const LIMITE_CARACTERES = 500;
 const BOAS_VINDAS = {
   id: 0,
   autor: "ia",
-  texto: "Olá! Posso ajudar com dúvidas sobre as obrigações e os documentos da sua empresa.",
+  texto: "Demonstração com respostas pré-programadas. Não consulto os dados da empresa nem um serviço de IA.",
 };
 
 /**
@@ -62,7 +62,7 @@ export default function ChatFlutuante() {
       {aberto && (
         <section className="chat-painel" aria-label="Chat com a IA">
           <header className="chat-topo">
-            <span>Assistente Regulariza</span>
+            <span>Assistente Regulariza — demonstração</span>
             <button
               type="button"
               className="chat-fechar"
@@ -106,7 +106,7 @@ export default function ChatFlutuante() {
             </button>
           </form>
           <p className="chat-aviso">
-            A IA pode errar. Confirme prazos e exigências com um contador ou com o órgão responsável.
+            Respostas simuladas, sem conexão com IA. Confirme prazos com o órgão responsável.
           </p>
         </section>
       )}

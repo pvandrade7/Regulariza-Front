@@ -36,19 +36,19 @@ export default function PerfilEmpresa({ empresa, onEditar }) {
                 <div className="resumo-avatar">{empresa.nome?.charAt(0) ?? "?"}</div>
                 <div>
                   <p className="resumo-nome">{empresa.nome}</p>
-                  <p className="resumo-porte">{empresa.porte}</p>
+                  <p className="resumo-porte">{empresa.porte || "Porte não informado"}</p>
                 </div>
               </div>
               <ul className="resumo-list">
                 <li>
-                  <span className="resumo-icon">🧾</span> CNPJ: {empresa.cnpj}
+                  <span className="resumo-icon">🧾</span> {empresa.cpf ? "CPF" : "CNPJ"}: {empresa.cpf || empresa.cnpj || "Não informado"}
                 </li>
                 <li>
                   <span className="resumo-icon">📍</span> {empresa.municipio}/{empresa.estado}
                 </li>
                 <li>
-                  <span className="resumo-icon">👥</span> {empresa.funcionarios} funcionário
-                  {Number(empresa.funcionarios) === 1 ? "" : "s"}
+                  <span className="resumo-icon">👥</span> {empresa.numeroFuncionarios} funcionário
+                  {Number(empresa.numeroFuncionarios) === 1 ? "" : "s"}
                 </li>
               </ul>
             </div>

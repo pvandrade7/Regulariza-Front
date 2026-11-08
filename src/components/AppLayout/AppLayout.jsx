@@ -1,6 +1,7 @@
 import { NavLink, useNavigate } from "react-router-dom";
 import Icon from "../Icon/Icon";
-import { clearToken } from "../../utils/auth";
+import { useState } from 'react';
+import { useAuth } from '../../hooks/useAuth';
 import { getEmpresa } from "../../utils/empresaStorage";
 import "./AppLayout.css";
 
@@ -24,12 +25,17 @@ const NAV_ITEMS = [
  */
 export default function AppLayout({ titulo, acao, empresa, children }) {
   const navigate = useNavigate();
+  const { sair } = useAuth();
+  const [erroLogout, setErroLogout] = useState('');
+  const [saindo, setSaindo] = useState(false);
   const dadosEmpresa = empresa ?? getEmpresa();
   const nomeEmpresa = dadosEmpresa?.nome || "Minha empresa";
 
-  function handleLogout() {
-    clearToken();
-    navigate("/login");
+  async function handleLogout() {
+    setSaindo(true); setErroLogout('');
+    try { await sair(); navigate('/login', { replace: true }); }
+    catch (err) { setErroLogout(err.message); }
+    finally { setSaindo(false); }
   }
 
   return (
@@ -53,7 +59,7 @@ export default function AppLayout({ titulo, acao, empresa, children }) {
           ))}
         </nav>
 
-        <button className="app-logout" type="button" onClick={handleLogout}>
+        <button className="app-logout" type="button" disabled={saindo} onClick={handleLogout}>
           <Icon nome="sair" />
           Sair
         </button>
@@ -73,7 +79,7 @@ export default function AppLayout({ titulo, acao, empresa, children }) {
             </div>
           </div>
         </header>
-        <main className="app-content">{children}</main>
+        <main className="app-content">{erroLogout && <div className="form-banner" role="alert">Não foi possível encerrar a sessão: {erroLogout}</div>}{children}</main>
       </div>
     </div>
   );
