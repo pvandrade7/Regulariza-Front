@@ -1,7 +1,6 @@
-import { listarObrigacoesEmpresa, atualizarObrigacaoEmpresa } from "./api.js";
+import { listarObrigacoesEmpresa, atualizarObrigacaoEmpresa, perguntarAssistente } from "./api.js";
 import { getEmpresaId } from "../utils/empresaStorage.js";
 import { calcularResumo, proximosVencimentos } from "../utils/prazos.js";
-import { respostaDeTeste } from "./mockData.js";
 
 export function normalizarObrigacao(o) {
   return { ...o, orgao: o.orgaoRelacionado, explicacao: o.motivo,
@@ -26,5 +25,10 @@ export async function obterDashboard() {
 }
 export async function listarDocumentos() { throw new Error("Documentos indisponíveis: o backend ainda não possui modelo nem rotas para metadados ou upload."); }
 export async function criarDocumento() { throw new Error("Cadastro de documentos ainda não implementado no backend."); }
-export async function enviarMensagem(texto) { return respostaDeTeste(texto); }
+export async function enviarMensagem(texto) {
+  const dados = await perguntarAssistente(texto);
+  const resposta = typeof dados?.resposta === "string" ? dados.resposta.trim() : "";
+  if (!resposta) throw new Error("O assistente não retornou uma resposta. Tente novamente.");
+  return resposta;
+}
 export async function listarAvisos() { return []; }

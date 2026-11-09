@@ -44,6 +44,7 @@ export const listarEmpresas = () => request('/empresas');
 export const fazerLogin = dados => request('/auth/login', { method: 'POST', body: dados });
 export const fazerLogout = () => request('/auth/logout', { method: 'POST', body: {} });
 export const consultarSessao = () => request('/auth/me');
+export const perguntarAssistente = mensagem => request('/assistente/perguntar', { method: 'POST', body: { mensagem } });
 export const buscarEmpresa = id => request(empresaPath(id));
 export const salvarEmpresa = (dados, id) => request(id ? empresaPath(id) : "/empresas", { method: id ? "PATCH" : "POST", body: dados });
 export const listarObrigacoesEmpresa = id => request(`${empresaPath(id)}/obrigacoes`);

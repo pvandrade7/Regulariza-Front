@@ -7,7 +7,7 @@ const LIMITE_CARACTERES = 500;
 const BOAS_VINDAS = {
   id: 0,
   autor: "ia",
-  texto: "Demonstração com respostas pré-programadas. Não consulto os dados da empresa nem um serviço de IA.",
+  texto: "Olá! Posso ajudar com dúvidas gerais sobre regularização e obrigações da sua empresa.",
 };
 
 /**
@@ -40,9 +40,10 @@ export default function ChatFlutuante() {
 
     try {
       const resposta = await enviarMensagem(pergunta);
-      if (!resposta) throw new Error("A IA não devolveu resposta.");
       setMensagens((lista) => [...lista, { id: Date.now() + 1, autor: "ia", texto: resposta }]);
     } catch (err) {
+      setMensagens((lista) => lista.slice(0, -1));
+      setTexto(pergunta);
       setErro(err.message || "Não foi possível obter a resposta. Tente novamente.");
     } finally {
       setCarregando(false);
@@ -62,7 +63,7 @@ export default function ChatFlutuante() {
       {aberto && (
         <section className="chat-painel" aria-label="Chat com a IA">
           <header className="chat-topo">
-            <span>Assistente Regulariza — demonstração</span>
+            <span>Assistente Regulariza</span>
             <button
               type="button"
               className="chat-fechar"
@@ -106,7 +107,7 @@ export default function ChatFlutuante() {
             </button>
           </form>
           <p className="chat-aviso">
-            Respostas simuladas, sem conexão com IA. Confirme prazos com o órgão responsável.
+            A pergunta é enviada ao Gemini. Evite incluir dados pessoais e confirme os prazos com o órgão responsável.
           </p>
         </section>
       )}
