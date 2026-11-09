@@ -1,0 +1,158 @@
+.modal-fundo {
+  position: fixed;
+  inset: 0;
+  z-index: 50;
+  background: rgba(17, 22, 29, 0.55);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--space-4);
+}
+
+.modal-painel {
+  background: var(--bg-card);
+  border-radius: var(--radius-md);
+  width: 100%;
+  max-width: 560px;
+  max-height: calc(100vh - 32px);
+  display: flex;
+  flex-direction: column;
+  box-shadow: var(--shadow-card);
+}
+
+.modal-topo {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--space-4);
+  padding: var(--space-5);
+  border-bottom: 1px solid var(--border);
+}
+
+.modal-titulo {
+  font-size: 19px;
+  margin-bottom: var(--space-2);
+}
+
+.modal-fechar {
+  background: none;
+  border: none;
+  font-size: 28px;
+  line-height: 1;
+  color: var(--text-muted);
+  cursor: pointer;
+  padding: 0 4px;
+}
+
+.modal-fechar:hover {
+  color: var(--text-primary);
+}
+
+.modal-corpo {
+  padding: var(--space-5);
+  overflow-y: auto;
+}
+
+.modal-dados {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--space-4);
+  margin: 0 0 var(--space-5);
+}
+
+.modal-dados dt {
+  font-size: 12.5px;
+  color: var(--text-muted);
+  margin-bottom: 2px;
+}
+
+.modal-dados dd {
+  margin: 0;
+  font-size: 14.5px;
+  font-weight: 500;
+}
+
+.modal-prazo {
+  display: block;
+  font-size: 12.5px;
+  font-weight: 600;
+}
+
+.modal-prazo.vermelho {
+  color: var(--danger-text);
+}
+
+.modal-prazo.amarelo {
+  color: var(--warning);
+}
+
+.modal-prazo.verde {
+  color: var(--teal-700);
+}
+
+.modal-secao {
+  margin-bottom: var(--space-5);
+}
+
+.modal-secao h3 {
+  font-size: 14px;
+  margin-bottom: var(--space-2);
+}
+
+.modal-secao p {
+  font-size: 14.5px;
+}
+
+.modal-secao.destaque {
+  background: rgba(14, 169, 155, 0.08);
+  border-radius: var(--radius-sm);
+  padding: var(--space-4);
+}
+
+.modal-responsavel {
+  margin-bottom: 0;
+}
+
+.modal-responsavel-linha {
+  display: flex;
+  gap: var(--space-2);
+}
+
+.modal-responsavel-linha input {
+  flex: 1;
+  min-width: 0;
+}
+
+.modal-rodape {
+  display: flex;
+  justify-content: flex-end;
+  gap: var(--space-3);
+  padding: var(--space-4) var(--space-5);
+  border-top: 1px solid var(--border);
+}
+
+/* Celular: o painel sobe da base da tela e ocupa a largura toda */
+@media (max-width: 560px) {
+  .modal-fundo {
+    align-items: flex-end;
+    padding: 0;
+  }
+
+  .modal-painel {
+    max-width: none;
+    max-height: 92vh;
+    border-radius: var(--radius-md) var(--radius-md) 0 0;
+  }
+
+  .modal-dados {
+    grid-template-columns: 1fr;
+  }
+
+  .modal-rodape {
+    flex-direction: column-reverse;
+  }
+
+  .modal-rodape button {
+    width: 100%;
+  }
+}

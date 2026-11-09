@@ -1,0 +1,97 @@
+.doc-colunas {
+  display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1.2fr);
+  gap: var(--space-5);
+  align-items: start;
+}
+
+.doc-colunas .field-row.two-cols {
+  grid-template-columns: 1fr 1fr;
+}
+
+.doc-sucesso {
+  background: var(--success-bg);
+  border: 1px solid rgba(14, 169, 155, 0.3);
+  color: var(--teal-700);
+  font-size: 13.5px;
+  border-radius: var(--radius-sm);
+  padding: 10px 14px;
+  margin-bottom: var(--space-5);
+}
+
+.doc-lista {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+.doc-item {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--space-3);
+  padding: 12px 14px;
+  border: 1px solid var(--border);
+  border-left: 4px solid var(--text-muted);
+  border-radius: 16px;
+}
+
+.doc-item.vermelho {
+  border-left-color: var(--danger);
+}
+
+.doc-item.amarelo {
+  border-left-color: #e8a014;
+}
+
+.doc-item.verde {
+  border-left-color: var(--teal-400);
+}
+
+.doc-item-info {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+  flex: 1;
+}
+
+.doc-item-nome {
+  font-size: 14.5px;
+  font-weight: 600;
+}
+
+.doc-item-meta {
+  font-size: 12.5px;
+  color: var(--text-muted);
+}
+
+@media (max-width: 1200px) {
+  .doc-colunas {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 480px) {
+  .doc-colunas .field-row.two-cols {
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+}
+
+/* Deixa cada campo encolher junto com a coluna, em vez de estourar a margem */
+.doc-colunas .field {
+  min-width: 0;
+}
+
+.doc-colunas .field input,
+.doc-colunas .field select {
+  width: 100%;
+  min-width: 0;
+}
+
+  .doc-item {
+    flex-direction: column;
+  }
+}

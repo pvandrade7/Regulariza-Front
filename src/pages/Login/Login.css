@@ -1,0 +1,75 @@
+.login-screen {
+  min-height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--space-5);
+  background:
+    radial-gradient(680px 420px at 82% 8%, rgba(20, 200, 182, 0.16), transparent 60%),
+    radial-gradient(600px 500px at 6% 100%, rgba(28, 47, 107, 0.35), transparent 65%),
+    var(--bg);
+}
+
+.login-card {
+  width: 100%;
+  max-width: 400px;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: var(--space-7) var(--space-6);
+  box-shadow: var(--shadow-card);
+}
+
+.login-mark {
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  border: 2px solid var(--teal-500);
+  position: relative;
+  margin-bottom: var(--space-5);
+}
+
+.login-mark::after {
+  content: "";
+  position: absolute;
+  inset: 8px;
+  border-radius: 50%;
+  background: var(--teal-500);
+}
+
+.login-eyebrow {
+  font-size: 12.5px;
+  letter-spacing: 0.02em;
+  color: var(--teal-400);
+  margin-bottom: var(--space-2);
+}
+
+.login-title {
+  font-size: 28px;
+  margin-bottom: var(--space-2);
+}
+
+.login-subtitle {
+  font-size: 14px;
+  margin-bottom: var(--space-6);
+}
+
+.login-footer {
+  margin-top: var(--space-5);
+  font-size: 13.5px;
+  text-align: center;
+}
+
+.link-btn {
+  background: none;
+  border: none;
+  padding: 0;
+  color: var(--teal-400);
+  font-size: inherit;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.link-btn:hover {
+  text-decoration: underline;
+}
