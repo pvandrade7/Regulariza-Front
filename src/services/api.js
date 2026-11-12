@@ -1,6 +1,6 @@
 let csrfToken = null;
 export function setCsrfToken(token) { csrfToken = token; }
-const BASE_URL = (import.meta.env?.VITE_API_URL || "http://localhost:3000").replace(/\/$/, "");
+const BASE_URL = (import.meta.env?.VITE_API_URL || "https://regulariza-back-production.up.railway.app").replace(/\/$/, "");
 export class ApiError extends Error {
   constructor(message, status) { super(message); this.status = status; }
 }
