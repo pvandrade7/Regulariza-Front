@@ -156,3 +156,31 @@
     width: 100%;
   }
 }
+
+.criterios-lista {
+  list-style: none;
+  padding: 0;
+  margin: 12px 0 0;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.criterios-lista li {
+  padding: 12px 14px;
+  border: 1px solid #e5e7eb;
+  border-radius: 10px;
+  background: #f9fafb;
+}
+
+.criterios-lista strong {
+  display: block;
+  margin-bottom: 6px;
+  font-size: 14px;
+}
+
+.criterios-lista p {
+  margin: 3px 0;
+  font-size: 13px;
+  color: #64748b;
+}

@@ -134,6 +134,64 @@ export default function ObrigacaoModal({ obrigacao, onSalvar, onFechar }) {
             </p>
           </section>
 
+
+          {Array.isArray(obrigacao.criteriosAvaliados) &&
+            obrigacao.criteriosAvaliados.length > 0 && (
+              <section className="modal-secao">
+                <h3>Critérios de aplicabilidade</h3>
+
+                <ul className="criterios-lista">
+                  {obrigacao.criteriosAvaliados.map((criterio, index) => {
+                    const nomesCampos = {
+                      regime_juridico_id: "Regime jurídico (ID)",
+                      numero_funcionarios: "Número de funcionários",
+                      estabelecimento_fisico: "Estabelecimento físico",
+                      estado: "Estado",
+                      municipio: "Município",
+                      porte: "Porte da empresa",
+                      atividade: "Atividade econômica",
+                    };
+
+                    const operadores = {
+                      "=": "igual a",
+                      "!=": "diferente de",
+                      ">": "maior que",
+                      "<": "menor que",
+                      ">=": "maior ou igual a",
+                      "<=": "menor ou igual a",
+                    };
+
+                    const formatarValor = (valor) => {
+                      if (valor === true || valor === "true") return "Sim";
+                      if (valor === false || valor === "false") return "Não";
+                      if (valor === null || valor === undefined || valor === "")
+                        return "Não informado";
+                      return String(valor);
+                    };
+
+                    return (
+                      <li key={`${criterio.campo}-${index}`}>
+                        <strong>
+                          {criterio.atendido ? "✓" : "✗"}{" "}
+                          {nomesCampos[criterio.campo] || criterio.campo}
+                        </strong>
+
+                        <p>
+                          Valor cadastrado: {formatarValor(criterio.valorEmpresa)}
+                        </p>
+
+                        <p>
+                          Condição exigida: {operadores[criterio.operador] || criterio.operador}{" "}
+                          {formatarValor(criterio.valorEsperado)}
+                        </p>
+                      </li>
+                    );
+                  })}
+                </ul>
+              </section>
+            )}
+
+
         </div>
 
         <footer className="modal-rodape">
