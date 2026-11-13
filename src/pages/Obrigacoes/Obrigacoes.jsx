@@ -14,7 +14,7 @@ import {
 import "./Obrigacoes.css";
 import { sincronizarObrigacoes } from "../../services/api";
 import { getEmpresaId } from "../../utils/empresaStorage";
-import { dataParaISO } from "../../utils/prazos";
+
 
 const FILTROS = [
   { valor: "em_andamento", rotulo: "Em andamento" },
@@ -59,7 +59,9 @@ function contagemDoFiltro(contagem, valor) {
 export default function Obrigacoes() {
   const [sincronizando, setSincronizando] = useState(false);
   const [sucesso, setSucesso] = useState("");
-  const [dataBase, setDataBase] = useState(dataParaISO());
+  const [competencia, setCompetencia] = useState("");
+  const [anoCalendario, setAnoCalendario] = useState("");
+  const [situacaoEspecial, setSituacaoEspecial] = useState(false);
   const [obrigacoes, setObrigacoes] = useState([]);
   const [carregando, setCarregando] = useState(true);
   const [erro, setErro] = useState("");
@@ -87,8 +89,12 @@ export default function Obrigacoes() {
   async function sincronizar() {
     setSincronizando(true); setErro(""); setSucesso("");
     try {
-      const resultado = await sincronizarObrigacoes(getEmpresaId(), dataBase);
-      setObrigacoes(await listarObrigacoes()); setSucesso(`${resultado.mensagem} ${resultado.vinculosCriados} vínculo(s) criado(s).`);
+      const resultado = await sincronizarObrigacoes(getEmpresaId(), {
+        ...(competencia ? { competencia } : {}),
+        ...(anoCalendario ? { anoCalendario: Number(anoCalendario) } : {}),
+        situacaoEspecial
+      });
+      setObrigacoes(await listarObrigacoes()); setSucesso(`${resultado.mensagem} ${resultado.vinculosCriados} vínculo(s) criado(s); ${resultado.vencimentosPreenchidos ?? 0} vencimento(s) preenchido(s). Datas anteriores preservadas.`);
     } catch (err) { setErro(err.message); } finally { setSincronizando(false); }
   }
   const fecharPainel = useCallback(() => setSelecionadaId(null), []);
@@ -101,9 +107,11 @@ export default function Obrigacoes() {
     <AppLayout titulo="Obrigações">
       <section className="app-card">
       <p className="hint">Triagem demonstrativa: os critérios cadastrados selecionam itens para revisão, mas não confirmam obrigação legal. Ausência na lista não significa dispensa. Status e indicadores refletem apenas os itens cadastrados.</p>
-        <p>Sincronize as obrigações aplicáveis após cadastrar ou editar a empresa. Os vencimentos calculados pela periodicidade são demonstrativos, não são prazos fiscais oficiais. Confirme as datas com o órgão responsável. Datas existentes são preservadas.</p>
-        <label htmlFor="data-base">Data base</label> <input id="data-base" type="date" value={dataBase} onChange={e => setDataBase(e.target.value)} />
-        <button className="btn-outline" disabled={sincronizando || carregando || !dataBase} onClick={sincronizar}>{sincronizando ? "Sincronizando..." : "Sincronizar obrigações"}</button>
+        <p>Sincronize as obrigações aplicáveis após cadastrar ou editar a empresa. Informe o período fiscal: DAS/FGTS usam competência mensal; DASN-SIMEI usa ano-calendário. Aplicamos regras gerais verificadas, sujeitas a situações especiais. Datas existentes são preservadas, inclusive demonstrativas antigas; confira a guia oficial.</p>
+        <label htmlFor="competencia">Competência mensal</label> <input id="competencia" type="month" value={competencia} onChange={e => setCompetencia(e.target.value)} />
+        <label htmlFor="ano-calendario">Ano-calendário da DASN-SIMEI</label> <input id="ano-calendario" type="number" min="2000" max="2099" placeholder="Ex.: 2025" value={anoCalendario} onChange={e => setAnoCalendario(e.target.value)} />
+        <label><input type="checkbox" checked={situacaoEspecial} onChange={e => setSituacaoEspecial(e.target.checked)} /> Situação especial, extinção ou prorrogação (não calcular pela regra geral)</label>
+        <button className="btn-outline" disabled={sincronizando || carregando || (!competencia && !anoCalendario)} onClick={sincronizar}>{sincronizando ? "Sincronizando..." : "Sincronizar obrigações"}</button>
         {sucesso && <p role="status">{sucesso}</p>}
       </section>
       {erro && <div className="form-banner">Não foi possível carregar as obrigações: {erro}</div>}

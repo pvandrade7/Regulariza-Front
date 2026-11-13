@@ -95,7 +95,8 @@ export default function ObrigacaoModal({ obrigacao, onSalvar, onFechar }) {
         <div className="modal-corpo">
           {erro && <div className="form-banner">{erro}</div>}
 
-          <p className="hint">Os vencimentos calculados pela periodicidade são demonstrativos, não são prazos fiscais oficiais. Confirme as datas com o órgão responsável.</p>
+          <p className="hint">Vencimentos cadastrados são preservados e podem incluir datas demonstrativas antigas. Novos cálculos usam período fiscal e regra conhecida. Confirme a guia oficial e eventuais prorrogações.</p>
+          {obrigacao.vencimentoAviso && <p className="hint">{obrigacao.vencimentoAviso}</p>}
           <dl className="modal-dados">
             <div>
               <dt>Vencimento</dt>

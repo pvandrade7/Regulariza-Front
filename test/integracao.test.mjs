@@ -109,3 +109,12 @@ test('datas da API chegam à listagem e ao dashboard sem inventar vencimentos au
   assert.equal(painel.resumo.concluidas,1);
   assert.match(painel.resumo.situacao.texto,/sem vencimento definido/);
 });
+
+test('sincronização envia competência e ano-calendário explicitamente, sem converter data-base',async()=>{
+ const {sincronizarObrigacoes}=await import('../src/services/api.js');
+ const corpos=[];
+ globalThis.fetch=async(_url,options)=>{corpos.push(JSON.parse(options.body));return new Response('{}');};
+ await sincronizarObrigacoes('empresa',{competencia:'2026-10',anoCalendario:2025,situacaoEspecial:false});
+ await sincronizarObrigacoes('empresa','2026-11-13');
+ assert.deepEqual(corpos,[{competencia:'2026-10',anoCalendario:2025,situacaoEspecial:false},{dataBase:'2026-11-13'}]);
+});

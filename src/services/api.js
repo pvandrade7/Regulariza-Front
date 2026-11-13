@@ -48,5 +48,5 @@ export const perguntarAssistente = mensagem => request('/assistente/perguntar', 
 export const buscarEmpresa = id => request(empresaPath(id));
 export const salvarEmpresa = (dados, id) => request(id ? empresaPath(id) : "/empresas", { method: id ? "PATCH" : "POST", body: dados });
 export const listarObrigacoesEmpresa = id => request(`${empresaPath(id)}/obrigacoes`);
-export const sincronizarObrigacoes = (id, dataBase) => request(`${empresaPath(id)}/obrigacoes/sincronizar`, { method: "POST", body: { dataBase } });
+export const sincronizarObrigacoes = (id, dataBase) => request(`${empresaPath(id)}/obrigacoes/sincronizar`, { method: "POST", body: typeof dataBase === "object" ? dataBase : { dataBase } });
 export const atualizarObrigacaoEmpresa = (empresaId, id, status) => request(`${empresaPath(empresaId)}/obrigacoes/${encodeURIComponent(id)}/status`, { method: "PATCH", body: { status } });

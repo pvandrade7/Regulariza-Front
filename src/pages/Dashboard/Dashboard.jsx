@@ -136,7 +136,7 @@ export default function Dashboard() {
                 </Link>
               </div>
 
-              <p className="hint">Os vencimentos calculados pela periodicidade são demonstrativos, não são prazos fiscais oficiais. Confirme as datas com o órgão responsável.</p>
+              <p className="hint">Vencimentos cadastrados são preservados e podem incluir datas demonstrativas antigas. Novos cálculos usam período fiscal e regra conhecida. Confirme a guia oficial e eventuais prorrogações.</p>
               {dados.proximos.length === 0 ? (
                 <p className="empty-state">Nenhum vencimento futuro conhecido. Consulte todas as obrigações, inclusive atrasadas ou sem data.</p>
               ) : (
