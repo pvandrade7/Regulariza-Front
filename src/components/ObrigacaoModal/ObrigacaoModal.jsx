@@ -29,8 +29,8 @@ const COR_STATUS = {
  *
  * Props:
  *  - obrigacao: { id, nome, descricao, categoria, periodicidade, orgao, vencimento,
- *                 status, responsavel, explicacao }
- *  - onSalvar(id, campos): salva { status?, responsavel? }. Deve lançar erro se falhar.
+ *                 status, explicacao }
+ * - onSalvar(id, campos): salva { status }. Deve lançar erro se falhar.
  *  - onFechar(): fecha o painel.
  */
 export default function ObrigacaoModal({ obrigacao, onSalvar, onFechar }) {
@@ -134,27 +134,6 @@ export default function ObrigacaoModal({ obrigacao, onSalvar, onFechar }) {
             </p>
           </section>
 
-          <section className="modal-secao">
-            <div className="field modal-responsavel">
-              <label htmlFor="responsavel">Responsável (sem suporte no backend)</label>
-              <div className="modal-responsavel-linha">
-                <input
-                  id="responsavel"
-                  placeholder="Nome de quem cuida desta obrigação"
-                  maxLength={150}
-                  value={obrigacao.responsavel ?? ""}
-                  disabled
-                />
-                <button
-                  type="button"
-                  className="btn-outline"
-                  disabled
-                >
-                  Salvar
-                </button>
-              </div>
-            </div>
-          </section>
         </div>
 
         <footer className="modal-rodape">
