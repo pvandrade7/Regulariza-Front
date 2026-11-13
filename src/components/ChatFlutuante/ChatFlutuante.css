@@ -186,3 +186,12 @@
     bottom: 16px;
   }
 }
+.chat-balao.ia { white-space: normal; }
+.chat-balao.ia p { margin: 0 0 10px; }
+.chat-balao.ia p:last-child { margin-bottom: 0; }
+.chat-balao.ia h1, .chat-balao.ia h2, .chat-balao.ia h3 { font-size: 14px; font-weight: 700; margin: 12px 0 6px; line-height: 1.4; }
+.chat-balao.ia h1:first-child, .chat-balao.ia h2:first-child, .chat-balao.ia h3:first-child { margin-top: 0; }
+.chat-balao.ia ul, .chat-balao.ia ol { margin: 8px 0; padding-left: 20px; }
+.chat-balao.ia li { margin-bottom: 6px; }
+.chat-balao.ia strong { font-weight: 700; }
+.chat-balao.ia a { color: #087f72; text-decoration: underline; overflow-wrap: anywhere; }

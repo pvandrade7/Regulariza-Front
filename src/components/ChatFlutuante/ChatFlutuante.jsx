@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import { enviarMensagem } from "../../services/dados";
 import "./ChatFlutuante.css";
+import ReactMarkdown from "react-markdown";
 
 const LIMITE_CARACTERES = 500;
 
@@ -77,7 +78,7 @@ export default function ChatFlutuante() {
           <div className="chat-mensagens" aria-live="polite">
             {mensagens.map((m) => (
               <div key={m.id} className={`chat-balao ${m.autor}`}>
-                {m.texto}
+                {m.autor === "ia" ? <ReactMarkdown>{m.texto}</ReactMarkdown> : m.texto}
               </div>
             ))}
             {carregando && (

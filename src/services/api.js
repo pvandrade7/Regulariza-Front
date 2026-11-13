@@ -17,7 +17,7 @@ export async function request(path, { method = "GET", body } = {}) {
       headers,
       credentials: "include",
       body: body === undefined ? undefined : JSON.stringify(body),
-      signal: AbortSignal.timeout(15000),
+      signal: AbortSignal.timeout(path === '/assistente/perguntar' ? 30000 : 15000),
     });
   } catch {
     throw new ApiError("Não foi possível conectar ao servidor ou o tempo de resposta foi excedido.", 0);
