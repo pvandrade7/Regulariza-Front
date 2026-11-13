@@ -85,6 +85,7 @@ export default function Dashboard() {
 
   return (
     <AppLayout titulo="Dashboard">
+      <p className="hint">Triagem demonstrativa: os critérios cadastrados selecionam itens para revisão, mas não confirmam obrigação legal. Ausência na lista não significa dispensa. Status e indicadores refletem apenas os itens cadastrados.</p>
       {location.state?.mensagem && <p role="status">{location.state.mensagem}</p>}
       {location.state?.avisoSincronizacao && <div className="form-banner" role="alert">{location.state.avisoSincronizacao} <Link to="/obrigacoes">Abrir Central de Obrigações</Link></div>}
       <p className="hint">Após editar o perfil, sincronize as obrigações na Central de Obrigações.</p>
@@ -135,6 +136,7 @@ export default function Dashboard() {
                 </Link>
               </div>
 
+              <p className="hint">Os vencimentos calculados pela periodicidade são demonstrativos, não são prazos fiscais oficiais. Confirme as datas com o órgão responsável.</p>
               {dados.proximos.length === 0 ? (
                 <p className="empty-state">Nenhum vencimento futuro conhecido. Consulte todas as obrigações, inclusive atrasadas ou sem data.</p>
               ) : (

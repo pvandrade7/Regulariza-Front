@@ -3,6 +3,7 @@ import { isRequired, isValidCPF, isValidCNPJ, isPositiveInteger, onlyDigits } fr
 export function iniciarEmpresaForm(empresa) {
   return {
     nome: '', cpf: '', cnpj: '', regimeJuridicoId: '', atividade: '', porte: '', municipio: '', estado: '',
+    cnaePrincipal: '', regimeTributario: '',
     ...empresa,
     funcionarios: String(empresa?.numeroFuncionarios ?? 0),
     estabelecimentoFisico: empresa ? (empresa.estabelecimentoFisico ? 'sim' : 'nao') : '',
@@ -26,6 +27,18 @@ export function validarEmpresaForm(form, regimes) {
   if (!isRequired(form.estado)) errors.estado = 'Selecione o estado.';
   if (!isPositiveInteger(form.funcionarios)) errors.funcionarios = 'Informe um inteiro entre 0 e 2147483647, sem sinal ou decimais.';
   if (!['sim', 'nao'].includes(form.estabelecimentoFisico)) errors.estabelecimentoFisico = 'Informe se a empresa possui estabelecimento físico.';
+
+  if (tipo === 'PJ') {
+    const cnae = onlyDigits(form.cnaePrincipal || '');
+
+    if (form.cnaePrincipal && !/^\d{7}$/.test(cnae)) {
+      errors.cnaePrincipal = 'O CNAE deve conter exatamente 7 dígitos.';
+    }
+
+    if (form.regimeTributario && form.regimeTributario.trim().length > 50) {
+      errors.regimeTributario = 'O regime tributário deve ter até 50 caracteres.';
+    }
+  }
   return errors;
 }
 
@@ -39,5 +52,13 @@ export function payloadEmpresa(form, regimes) {
     porte: form.porte || null, municipio: form.municipio.trim(), estado: form.estado,
     numeroFuncionarios: Number(form.funcionarios),
     estabelecimentoFisico: form.estabelecimentoFisico === 'sim',
+    cnaePrincipal: tipo === 'PJ'
+      ? onlyDigits(form.cnaePrincipal || '') || null
+      : null,
+
+    regimeTributario: tipo === 'PJ'
+      ? form.regimeTributario?.trim() || null
+      : null,
+
   };
 }

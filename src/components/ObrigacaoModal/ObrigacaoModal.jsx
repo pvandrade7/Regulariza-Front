@@ -95,11 +95,12 @@ export default function ObrigacaoModal({ obrigacao, onSalvar, onFechar }) {
         <div className="modal-corpo">
           {erro && <div className="form-banner">{erro}</div>}
 
+          <p className="hint">Os vencimentos calculados pela periodicidade são demonstrativos, não são prazos fiscais oficiais. Confirme as datas com o órgão responsável.</p>
           <dl className="modal-dados">
             <div>
               <dt>Vencimento</dt>
               <dd>
-                {formatarData(obrigacao.vencimento)}
+                {dias === null ? "Sem vencimento definido" : formatarData(obrigacao.vencimento)}
                 {!concluida && (
                   <span className={`modal-prazo ${corDoPrazo(dias)}`}>{textoPrazo(dias)}</span>
                 )}
@@ -127,7 +128,8 @@ export default function ObrigacaoModal({ obrigacao, onSalvar, onFechar }) {
           )}
 
           <section className="modal-secao destaque">
-            <h3>Por que isso se aplica à sua empresa</h3>
+            <p>Seleção demonstrativa pelos critérios cadastrados; não confirma obrigação legal.</p>
+            <h3>Por que este item foi selecionado para revisão</h3>
             <p>
               {obrigacao.explicacao ||
                 "Ainda não há uma explicação cadastrada para esta obrigação."}
@@ -139,6 +141,7 @@ export default function ObrigacaoModal({ obrigacao, onSalvar, onFechar }) {
             obrigacao.criteriosAvaliados.length > 0 && (
               <section className="modal-secao">
                 <h3>Critérios de aplicabilidade</h3>
+                <p>Todos os critérios de um mesmo grupo precisam ser atendidos (AND). Basta um grupo completo ser atendido (OR).</p>
 
                 <ul className="criterios-lista">
                   {obrigacao.criteriosAvaliados.map((criterio, index) => {
@@ -150,6 +153,8 @@ export default function ObrigacaoModal({ obrigacao, onSalvar, onFechar }) {
                       municipio: "Município",
                       porte: "Porte da empresa",
                       atividade: "Atividade econômica",
+                      cnae_principal: "CNAE principal",
+                      regime_tributario: "Regime tributário",
                     };
 
                     const operadores = {
@@ -172,7 +177,7 @@ export default function ObrigacaoModal({ obrigacao, onSalvar, onFechar }) {
                     return (
                       <li key={`${criterio.campo}-${index}`}>
                         <strong>
-                          {criterio.atendido ? "✓" : "✗"}{" "}
+                          Grupo {criterio.grupo ?? 1} · {criterio.atendido ? "✓" : "✗"}{" "}
                           {nomesCampos[criterio.campo] || criterio.campo}
                         </strong>
 

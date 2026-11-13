@@ -90,3 +90,22 @@ test('401 em recurso privado sinaliza sessão expirada sem persistir token',asyn
     await request('/empresas',{method:'POST',body:{}});assert.equal(headers['X-CSRF-Token'],undefined);
   } finally {globalThis.window=originalWindow;setCsrfToken(null);}
 });
+
+test('datas da API chegam à listagem e ao dashboard sem inventar vencimentos ausentes', async () => {
+  const {formatarData, diasAte, textoPrazo}=await import('../src/utils/prazos.js');
+  saveEmpresaId('empresa');
+  globalThis.fetch=async()=>new Response(JSON.stringify({obrigacoes:[
+    {id:1,status:'Em andamento',vencimento:'2099-12-13'},
+    {id:2,status:'Pendente',vencimento:null},
+    {id:3,status:'Concluída',vencimento:null}
+  ]}));
+  const lista=await listarObrigacoes();
+  assert.equal(formatarData(lista[0].vencimento),'13/12/2099');
+  assert.equal(lista[1].vencimento,null);
+  assert.equal(textoPrazo(diasAte(lista[1].vencimento)),'Sem data');
+  const painel=await obterDashboard();
+  assert.deepEqual(painel.proximos.map(o=>o.id),[1]);
+  assert.equal(painel.resumo.emAndamento,1);
+  assert.equal(painel.resumo.concluidas,1);
+  assert.match(painel.resumo.situacao.texto,/sem vencimento definido/);
+});

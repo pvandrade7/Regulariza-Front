@@ -7,6 +7,12 @@ import { listarRegimes } from "../../services/api";
 
 const PORTES = ["MEI", "Microempresa (ME)", "Pequena empresa", "Média empresa"];
 
+const REGIMES_TRIBUTARIOS = [
+  "Simples Nacional",
+  "Lucro Presumido",
+  "Lucro Real",
+];
+
 const ATIVIDADES = [
   "Comércio varejista",
   "Comércio atacadista",
@@ -159,6 +165,46 @@ export default function CadastroEmpresa({ onSubmit, empresa }) {
               </div>
             </div>
 
+            {tipo === "PJ" && (
+              <div className="field-row two-cols">
+                <div className={`field ${errors.cnaePrincipal ? "has-error" : ""}`}>
+                  <label htmlFor="cnaePrincipal">CNAE principal (opcional)</label>
+                  <input
+                    id="cnaePrincipal"
+                    inputMode="numeric"
+                    maxLength={9}
+                    placeholder="Ex.: 6201-5/01"
+                    value={form.cnaePrincipal || ""}
+                    onChange={(e) => setField("cnaePrincipal", e.target.value)}
+                  />
+                  {errors.cnaePrincipal && (
+                    <span className="error-text">{errors.cnaePrincipal}</span>
+                  )}
+                  <span className="hint">Código da atividade econômica principal.</span>
+                </div>
+
+                <div className={`field ${errors.regimeTributario ? "has-error" : ""}`}>
+                  <label htmlFor="regimeTributario">Regime tributário (opcional)</label>
+                  <select
+                    id="regimeTributario"
+                    value={form.regimeTributario || ""}
+                    onChange={(e) => setField("regimeTributario", e.target.value)}
+                  >
+                    <option value="">Selecione</option>
+                    {REGIMES_TRIBUTARIOS.map((regime) => (
+                      <option key={regime} value={regime}>
+                        {regime}
+                      </option>
+                    ))}
+                  </select>
+                  {errors.regimeTributario && (
+                    <span className="error-text">{errors.regimeTributario}</span>
+                  )}
+                </div>
+              </div>
+            )}
+
+
             <div className="field-row two-cols">
               <div className={`field ${errors.porte ? "has-error" : ""}`}>
                 <label htmlFor="porte">Porte (opcional)</label>
@@ -241,9 +287,8 @@ export default function CadastroEmpresa({ onSubmit, empresa }) {
                 ].map((opt) => (
                   <label
                     key={opt.value}
-                    className={`radio-option ${
-                      form.estabelecimentoFisico === opt.value ? "selected" : ""
-                    }`}
+                    className={`radio-option ${form.estabelecimentoFisico === opt.value ? "selected" : ""
+                      }`}
                   >
                     <input
                       type="radio"

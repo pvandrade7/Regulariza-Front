@@ -100,7 +100,8 @@ export default function Obrigacoes() {
   return (
     <AppLayout titulo="Obrigações">
       <section className="app-card">
-        <p>Sincronize as obrigações aplicáveis após cadastrar ou editar a empresa. Os vencimentos calculados pela periodicidade são demonstrativos e precisam de conferência; datas existentes são preservadas.</p>
+      <p className="hint">Triagem demonstrativa: os critérios cadastrados selecionam itens para revisão, mas não confirmam obrigação legal. Ausência na lista não significa dispensa. Status e indicadores refletem apenas os itens cadastrados.</p>
+        <p>Sincronize as obrigações aplicáveis após cadastrar ou editar a empresa. Os vencimentos calculados pela periodicidade são demonstrativos, não são prazos fiscais oficiais. Confirme as datas com o órgão responsável. Datas existentes são preservadas.</p>
         <label htmlFor="data-base">Data base</label> <input id="data-base" type="date" value={dataBase} onChange={e => setDataBase(e.target.value)} />
         <button className="btn-outline" disabled={sincronizando || carregando || !dataBase} onClick={sincronizar}>{sincronizando ? "Sincronizando..." : "Sincronizar obrigações"}</button>
         {sucesso && <p role="status">{sucesso}</p>}
@@ -150,7 +151,7 @@ export default function Obrigacoes() {
                         </span>
                       </span>
                       <span className="ob-item-data">
-                        <span className="ob-item-data-valor">{formatarData(o.vencimento)}</span>
+                        <span className="ob-item-data-valor">{dias === null ? "Sem vencimento definido" : formatarData(o.vencimento)}</span>
                         {status !== "concluida" && (
                           <span className="ob-item-data-texto">{textoPrazo(dias)}</span>
                         )}
