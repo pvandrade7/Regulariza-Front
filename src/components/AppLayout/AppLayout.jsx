@@ -10,7 +10,6 @@ import "./AppLayout.css";
 const NAV_ITEMS = [
   { to: "/dashboard", label: "Dashboard", icone: "dashboard" },
   { to: "/obrigacoes", label: "Obrigações", icone: "obrigacoes" },
-  { to: "/documentos", label: "Documentos", icone: "documentos" },
   { to: "/perfil-empresa", label: "Perfil da empresa", icone: "perfil" },
 ];
 
